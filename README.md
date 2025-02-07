@@ -81,13 +81,11 @@ The backend microservices follow a **layered architecture** with routes, service
 
 ## Screenshots
 
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-  <img src="screenshots/Login.png" width="300">
-  <img src="screenshots/ProjectDetails.png" width="300">
-  <img src="screenshots/Projects.png" width="300">
-  <img src="screenshots/Backlog.png" width="300">
-  <img src="screenshots/CreateTask.png" width="300">
-  <img src="screenshots/CurrentSprint.png" width="300">
-  <img src="screenshots/EditProject.png" width="300">
-  <img src="screenshots/Users.png" width="300">
-</div>
+![Login](screenshots/Login.png)
+![ProjectDetails](screenshots/ProjectDetails.png)
+![Projects](screenshots/Projects.png)
+![Backlog.png](screenshots/Backlog.png)
+![CreateTask](screenshots/CreateTask.png)
+![CurrentSprint](screenshots/CreateSprint.png)
+![EditProject](screenshots/EditProject.png)
+![Users](screenshots/Users.png)
