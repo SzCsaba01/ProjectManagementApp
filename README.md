@@ -12,8 +12,6 @@ A project management application designed to handle user information, project ma
 - [Frontend](#frontend)
 - [Backend](#backend)
 - [Future Enhancements](#future-enhancements)
-- [Installation](#installation)
-- [License](#license)
 
 ## Technologies
 
@@ -81,3 +79,15 @@ The backend microservices follow a **layered architecture** with routes, service
 - **Redis Cache**: For improving performance by caching frequently accessed data.
 - **CI/CD Pipeline**: Using **Docker** and **Kubernetes** to automate deployments and scale the application.
 
+## Screenshots
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+  <img src="screenshots/Login.png" width="300">
+  <img src="screenshots/ProjectDetails.png" width="300">
+  <img src="screenshots/Projects.png" width="300">
+  <img src="screenshots/Backlog.png" width="300">
+  <img src="screenshots/CreateTask.png" width="300">
+  <img src="screenshots/CurrentSprint.png" width="300">
+  <img src="screenshots/EditProject.png" width="300">
+  <img src="screenshots/Users.png" width="300">
+</div>
