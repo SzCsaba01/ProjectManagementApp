@@ -1,0 +1,8 @@
+.login .forgot-password-link-container {
+    display: flex;
+    justify-content: center;
+}
+
+.login .link-navigate .link-button {
+    margin-left: 0.5rem;
+}

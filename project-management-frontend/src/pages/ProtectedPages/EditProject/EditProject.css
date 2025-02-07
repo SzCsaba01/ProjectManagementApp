@@ -1,0 +1,29 @@
+.edit-project-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.select-component {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.select-component .select-avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+}
+
+.edit-project-container .input-container,
+.edit-project-container .select-container {
+    margin-top: 0.2rem;
+}
+
+.edit-project-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}

@@ -1,0 +1,61 @@
+.custom-button {
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition:
+        background-color 0.3s ease,
+        transform 0.2s,
+        box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.custom-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.custom-button.primary {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+.custom-button.secondary {
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+}
+
+.custom-button.danger {
+    background-color: var(--danger-color);
+    color: var(--white-color);
+}
+
+.custom-button.success {
+    background-color: var(--success-color);
+    color: var(--white-color);
+}
+
+.custom-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0.625rem 1.25rem rgba(0, 0, 0, 0.15);
+}
+
+.custom-button.primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.custom-button.secondary:hover {
+    background-color: var(--secondary-hover);
+}
+
+.custom-button.danger:hover {
+    background-color: var(--danger-hover);
+}
+
+.custom-button.success:hover {
+    background-color: var(--success-hover);
+}

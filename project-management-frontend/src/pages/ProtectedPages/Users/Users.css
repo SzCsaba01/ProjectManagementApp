@@ -1,0 +1,33 @@
+.users-table-options {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    background-color: inherit;
+}
+
+.users-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.users-container h1 {
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+.users-table-container {
+    background-color: var(--white-color);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 0.5rem var(--shadow);
+    width: 90%;
+}
+
+.search-bar-container {
+    background-color: inherit;
+}

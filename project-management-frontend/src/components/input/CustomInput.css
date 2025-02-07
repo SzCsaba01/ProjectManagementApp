@@ -1,0 +1,53 @@
+.input-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    background-color: inherit;
+    flex-direction: column;
+}
+
+.custom-input {
+    width: 91%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--light-gray-color);
+    border-radius: 0.25rem;
+    outline: none;
+    background-color: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.custom-input:focus {
+    border-color: var(--primary-color);
+}
+
+.custom-input:focus + .custom-label {
+    color: var(--primary-color);
+}
+
+.custom-label {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: #aaa;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    background-color: inherit;
+}
+
+.custom-input:focus + .custom-label,
+.custom-input:not(:placeholder-shown) + .custom-label {
+    top: -0.1rem;
+    left: 0.75rem;
+    font-size: 0.75rem;
+}
+
+.custom-input.error {
+    border-color: var(--danger-color);
+}
+
+.custom-input.error + .custom-label {
+    color: var(--danger-color);
+}

@@ -1,0 +1,33 @@
+.notification-bar {
+    position: fixed;
+    bottom: 17%;
+    right: 5%;
+    width: 40%;
+    max-width: 25rem;
+    z-index: 1000;
+    padding: 1.5rem 0.5rem;
+    border-radius: 0.3125rem;
+    text-align: center;
+    color: white;
+    font-size: 1rem;
+    animation: slide-in 1s ease;
+}
+
+.notification.success {
+    background-color: #4caf50;
+}
+
+.notification.error {
+    background-color: #f44336;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

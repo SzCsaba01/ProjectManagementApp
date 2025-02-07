@@ -1,0 +1,96 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--nav-background);
+    color: var(--nav-text);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--nav-brand-color);
+}
+
+.navbar-brand-icon {
+    font-size: 2rem;
+}
+
+.navbar-tabs {
+    display: flex;
+    gap: 1rem;
+}
+
+.navbar-tab {
+    font-size: 1rem;
+    color: var(--nav-text);
+    padding: 0.5rem 1rem;
+    border-radius: 0.3rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-tab:hover {
+    background-color: var(--nav-hover-bg);
+}
+
+.navbar-tab.active {
+    background-color: var(--nav-brand-color);
+    color: var(--white-color);
+}
+
+.navbar-profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 3rem;
+}
+
+.navbar-profile .profile-image {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.navbar-profile-dropdown {
+    position: absolute;
+    top: 95%;
+    right: 0;
+    background-color: var(--dropdown-bg);
+    color: var(--dropdown-text);
+    display: none;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    width: 7rem;
+    z-index: 10;
+}
+
+.navbar-profile:hover .navbar-profile-dropdown {
+    display: block;
+}
+
+.navbar-profile-dropdown li {
+    padding: 0.5rem;
+    cursor: pointer;
+    background-color: var(--dropdown-bg);
+}
+
+.navbar-profile-dropdown li:hover {
+    background-color: var(--dropdown-hover-bg);
+}
+
+.navbar-profile-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}

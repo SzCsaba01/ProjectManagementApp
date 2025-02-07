@@ -1,0 +1,40 @@
+.file-input {
+    display: none;
+}
+
+.profile-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.profile-container .profile-image {
+    width: 10rem;
+    height: 10rem;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 0.2rem solid var(--table-border-color);
+    transition: transform 0.3s ease;
+}
+
+.profile-container .profile-image:hover {
+    transform: scale(1.05);
+    border-color: var(--primary-color);
+}
+
+.profile-image-container {
+    display: flex;
+    justify-content: center;
+    margin: 0 1rem 1rem 1rem;
+}
+
+.profile-container .input-container input:disabled {
+    margin-bottom: 2rem;
+}
+
+.profile-footer {
+    display: flex;
+    justify-content: center;
+}

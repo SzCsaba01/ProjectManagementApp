@@ -1,0 +1,37 @@
+.task-container {
+    width: 80%;
+    height: 20%;
+    display: flex;
+    border-radius: 0.5rem;
+    border: 0.1rem solid var(--light-gray-color);
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0 1rem;
+    transition: 0.4s ease border-color;
+}
+
+.task-container:hover {
+    border-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.task-container .task-type {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.task-container .task-details {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.task-container .task-details img {
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+}

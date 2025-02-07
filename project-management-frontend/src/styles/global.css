@@ -1,0 +1,107 @@
+.link-button {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.link-button:hover {
+    color: var(--primary-hover);
+}
+
+.link-navigate {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+    width: 100%;
+    max-width: 30rem;
+    background-color: var(--white-color);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    background-color: inherit;
+}
+
+.form-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.public-page-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    width: 25vw;
+}
+
+.public-page-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.input-error-message {
+    color: var(--danger-color);
+    font-size: 0.7rem;
+    display: block;
+    visibility: hidden;
+    min-height: 1rem;
+}
+
+.input-error-message.visible {
+    visibility: visible;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+.fa-bug {
+    color: var(--icon-category-color-bug);
+}
+
+.fa-exclamation-triangle {
+    color: var(--icon-category-color-hotfix);
+}
+
+.fa-cogs {
+    color: var(--icon-category-color-feature);
+}
+
+.fa-circle {
+    color: var(--icon-priority-color-low);
+}
+
+.fa-circle-dot {
+    color: var(--icon-priority-color-medium);
+}
+
+.fa-circle-exclamation {
+    color: var(--icon-priority-color-high);
+}
+
+.fa-arrow-alt-circle-right {
+    color: var(--icon-backlog-status-color-current-sprint);
+}
+
+.fa-ban {
+    color: var(--icon-backlog-status-color-blocked);
+}
+
+.fa-lightbulb {
+    color: var(--icon-backlog-status-color-in-planning);
+}

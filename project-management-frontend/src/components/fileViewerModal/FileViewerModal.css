@@ -1,0 +1,57 @@
+.view-file-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.view-file-modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.view-file-modal {
+    display: flex;
+    background-color: var(--white-color);
+    border-radius: 0.5rem;
+    width: 90%;
+    height: 90%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.view-file-modal-header {
+    margin-top: 1.5rem;
+    width: 95%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.view-file-modal-body {
+    display: flex;
+    justify-content: center;
+    width: 95%;
+    height: 95%;
+    margin: 2rem 0rem;
+}
+
+.view-file-modal-image {
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.view-file-modal-pdf {
+    width: 80%;
+    height: 100%;
+    object-fit: contain;
+}

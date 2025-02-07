@@ -1,0 +1,20 @@
+.protected-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.protected-layout-container {
+    display: flex;
+    flex: 1;
+}
+
+.protected-layout-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 1.25rem;
+    overflow-y: auto;
+    background-color: var(--layout-background);
+    color: var(--text-light-gray-color);
+}

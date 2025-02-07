@@ -1,0 +1,69 @@
+.backlog-overlay {
+    height: 90%;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.backlog-container {
+    width: -webkit-fill-available;
+    display: flex;
+    height: 100%;
+    gap: 1rem;
+    flex-direction: row;
+}
+
+.backlog-board {
+    display: flex;
+    background-color: var(--white-color);
+    width: 100%;
+    box-shadow: 0.5rem 0.5rem 2rem var(--shadow);
+    flex-direction: column;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.backlog-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.backlog-actions.single {
+    justify-content: end;
+}
+
+.create-section {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.create-section:hover {
+    cursor: pointer;
+    background-color: var(--light-gray-color);
+    transition: background-color 0.3s ease;
+    border-radius: 0.3rem;
+}
+
+.task-drop-containers {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.task-drop-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 20rem;
+}
+
+.container-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}

@@ -1,0 +1,119 @@
+@import "~@fortawesome/fontawesome-free/css/all.min.css";
+@import "./styles/global.css";
+
+:root {
+    --layout-background: #f4f4f9;
+    --header-background: #2c3e50;
+    --footer-text: #bdc3c7;
+    --footer-background: #34495e;
+    --shadow: rgba(0, 0, 0, 0.25);
+
+    --nav-background: #2c3e50;
+    --nav-text: #ecf0f1;
+    --nav-hover-bg: #34495e;
+    --nav-brand-color: #1abc9c;
+
+    --dropdown-bg: #34495e;
+    --dropdown-text: #ecf0f1;
+    --dropdown-hover-bg: #7f8c8d;
+
+    --primary-color: #1abc9c;
+    --primary-hover: #16a085;
+    --secondary-color: #95a5a6;
+    --secondary-hover: #7f8c8d;
+    --danger-color: #e74c3c;
+    --danger-hover: #c0392b;
+    --success-color: #2ecc71;
+    --success-hover: #27ae60;
+
+    --black-color: #000000;
+    --white-color: #ffffff;
+    --light-gray-color: #bdc3c7;
+    --hover-light-gray-color: #d4d9dd;
+    --text-light-gray-color: #95a5a6;
+    --footer-background-color: #2c3e50;
+
+    --table-background-color: #fafafa;
+    --table-border-color: #d1d1d1;
+    --table-header-background-color: #4e5b6e;
+    --table-header-color: #ffffff;
+    --table-row-background-color: #ffffff;
+    --table-row-hover-background-color: #f0f5f5;
+    --table-row-hover-text-color: #2c3e50;
+    --table-footer-background-color: #d1d9df;
+    --table-footer-color: #7f8c8d;
+    --table-border-separator-color: #e0e0e0;
+
+    --icon-category-color-hotfix: #ff6a3d;
+    --icon-category-color-bug: #e63946;
+    --icon-category-color-feature: #4caf50;
+
+    --icon-priority-color-low: #2ecc71;
+    --icon-priority-color-medium: #f39c12;
+    --icon-priority-color-high: #c0392b;
+
+    --icon-backlog-status-color-current-sprint: #3498db;
+    --icon-backlog-status-color-blocked: #e74c3c;
+    --icon-backlog-status-color-in-planning: #f1c40f;
+}
+
+footer {
+    background-color: var(--footer-background-color);
+    padding: 1.25rem;
+    text-align: center;
+    color: var(--text-light-gray-color);
+}
+
+footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+button {
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.3125rem;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button.primary {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+button.primary:hover {
+    background-color: var(--primary-hover);
+}
+
+button.secondary {
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+}
+
+button.secondary:hover {
+    background-color: var(--secondary-hover);
+}
+
+button.danger {
+    background-color: var(--danger-color);
+    color: var(--white-color);
+}
+
+button.danger:hover {
+    background-color: var(--danger-hover);
+}
+
+button.success {
+    background-color: var(--success-color);
+    color: var(--white-color);
+}
+
+button.success:hover {
+    background-color: var(--success-hover);
+}

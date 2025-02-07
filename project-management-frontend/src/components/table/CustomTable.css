@@ -1,0 +1,81 @@
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 0.125rem 0.5rem var(--shadow);
+    background-color: var(--table-background);
+    border-radius: 0.5rem;
+    border: 0.0625rem solid var(--table-border);
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 0.75rem 0.9375rem;
+    text-align: left;
+    border-bottom: 0.0625rem solid var(--table-border-separator-color);
+}
+
+.custom-table th {
+    background-color: var(--table-header-background-color);
+    color: var(--table-header-color);
+    font-weight: bold;
+}
+
+.custom-table tbody tr {
+    background-color: var(--table-row-background-color);
+    transition: background-color 0.3s ease;
+}
+
+.custom-table tbody tr:hover {
+    background-color: var(--table-row-hover-background-color);
+    color: var(--table-row-hover-text-color);
+}
+
+.custom-table tfoot tr {
+    background-color: var(--table-footer-background-color);
+    color: var(--table-footer-color);
+}
+
+.custom-table .clickable-row {
+    cursor: pointer;
+}
+
+.custom-table tfoot td {
+    padding: 0.75rem 0.9375rem;
+}
+
+.custom-table .table-image {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto;
+}
+
+.custom-table .table-navigation-button {
+    color: var(--primary-color);
+}
+
+.custom-table .table-navigation-button:hover:not(.disabled) {
+    cursor: pointer;
+    transform: scale(1.1);
+    color: var(--primary-hover);
+}
+
+.custom-table .table-navigation-button.disabled {
+    opacity: 0.5;
+    cursor: unset;
+}
+
+.custom-table .table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.custom-table .table-footer .table-navigation {
+    display: flex;
+}
+
+.table-navigation span {
+    margin: 0 1rem;
+}
