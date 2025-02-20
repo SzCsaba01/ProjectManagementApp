@@ -40,6 +40,14 @@ export const getProjectsByOwnerId = async (ownerId) => {
     ).data;
 };
 
+export const getProjectsByMemberOrOwnerId = async (userId) => {
+    return (
+        await api.get('/project/get-projects-by-member-or-owner-id', {
+            params: { userId: userId },
+        })
+    ).data;
+};
+
 //UPDATE
 export const updateProject = async (project) => {
     return await api.put('/project/update-project', project);

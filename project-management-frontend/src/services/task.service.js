@@ -19,6 +19,14 @@ export const getCurrentSprintTasksBySprintId = async (sprintId) => {
     ).data;
 };
 
+export const getTasksBySprintId = async (sprintId) => {
+    return (
+        await api.get('/task/get-sprint-tasks-by-sprint-id', {
+            params: { sprintId: sprintId },
+        })
+    ).data;
+};
+
 export const getTasksByBacklogId = async (backlogId) => {
     return (
         await api.get('/task/get-tasks-by-backlog-id', {
@@ -28,11 +36,22 @@ export const getTasksByBacklogId = async (backlogId) => {
 };
 
 //UPDATE
-export const updateTasksIndex = async (tasks, sprintId = undefined) => {
-    return await api.put('/task/update-tasks-index', {
-        tasks: tasks,
-        sprintId: sprintId,
-    });
+export const updateTasksIndex = async (
+    tasks,
+    draggedTaskId,
+    type = '',
+    sprintId = null,
+    backlogId = null,
+) => {
+    return (
+        await api.put('/task/update-tasks-index', {
+            tasks: tasks,
+            draggedTaskId: draggedTaskId,
+            type: type,
+            sprintId: sprintId,
+            backlogId: backlogId,
+        })
+    ).data;
 };
 
 export const updateTask = async (task) => {
@@ -42,3 +61,6 @@ export const updateTask = async (task) => {
 };
 
 //DELETE
+export const deleteTask = async (taskId) => {
+    return await api.delete('/task/delete-task', { data: { taskId: taskId } });
+};

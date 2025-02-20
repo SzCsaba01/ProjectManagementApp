@@ -6,8 +6,11 @@ import CustomDropdown from '../../../components/dropdown/CustomDropdown';
 import './Users.css';
 import useDebounce from '../../../hooks/useDebounce.hook';
 import { DEFAULT_PROFILE_IMAGE } from '../../../utils/constants.util';
+import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
+    const navigate = useNavigate();
+
     const [paginatedUsers, setPaginatedUsers] = useState([]);
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -63,8 +66,7 @@ const Users = () => {
     };
 
     const handleRowClick = (rowIndex, data) => {
-        console.log(rowIndex);
-        console.log(data);
+        navigate('../user-details', { state: { user: data } });
     };
 
     return (

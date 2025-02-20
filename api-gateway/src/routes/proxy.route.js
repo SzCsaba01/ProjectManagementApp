@@ -4,8 +4,9 @@ import {
     authorizationMiddleware,
     authenticationMiddleware,
 } from '../middlewares/index.js';
+import createWebSocketProxy from '../utils/websocketProxy.js';
 
-const proxyRoutes = (app) => {
+const proxyRoutes = (app, server) => {
     const routeList = routes();
 
     routeList.forEach((route) => {
@@ -20,6 +21,9 @@ const proxyRoutes = (app) => {
                 pathRewrite: {},
             }),
         );
+        if (route.enableWebSocket) {
+            createWebSocketProxy(server, route);
+        }
     });
 };
 

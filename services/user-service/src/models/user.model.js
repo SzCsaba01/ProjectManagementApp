@@ -52,6 +52,7 @@ const userSchema = new mongoose.Schema({
     ],
     selectedProjectId: {
         type: String,
+        default: null,
     },
 });
 

@@ -51,7 +51,6 @@ const CreateSprintModal = ({ onClose }) => {
 
     const onSubmit = async (data) => {
         const sprint = await createSprint(projectId, backlogId, data);
-        console.log(sprint);
 
         dispatch(setCurrentSprintAction(sprint.sprintId));
 

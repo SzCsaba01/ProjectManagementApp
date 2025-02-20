@@ -9,6 +9,7 @@ import ProjectDetails from '../pages/ProtectedPages/ProjectDetails/ProjectDetail
 import Projects from '../pages/ProtectedPages/Projects/Projects';
 import Sprint from '../pages/ProtectedPages/Sprint/Sprint';
 import SprintHistory from '../pages/ProtectedPages/SprintHistory/SprintHistory';
+import SprintHistoryDetails from '../pages/ProtectedPages/SprintHistoryDetails/SprintHistoryDetails';
 import UserDetails from '../pages/ProtectedPages/UserDetails/UserDetails';
 import Users from '../pages/ProtectedPages/Users/Users';
 import ChangePassword from '../pages/PublicPages/ChangePassword/ChangePassword';
@@ -103,6 +104,10 @@ const routes = [
             {
                 path: 'sprint-history',
                 component: <SprintHistory />,
+            },
+            {
+                path: 'sprint-history/details',
+                component: <SprintHistoryDetails />,
             },
         ],
     },

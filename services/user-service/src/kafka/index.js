@@ -1,8 +1,19 @@
-import { connectKafkaAsync, disconnectKafkaAsync } from './kafkaConsumer.js';
-import startKafkaSubscriptionsAsync from './kafkaSubscriber.js';
+import {
+    connectKafkaProjectConsumerAsync,
+    disconnectKafkaProjectConsumerAsync,
+} from './kafkaProjectConsumer.js';
+import {
+    connectKafkaUserProducerAsync,
+    disconnectKafkaUserProducerAsync,
+} from './kafkaUserProducer.js';
+import startKafkaProjectSubscriptionsAsync from './kafkaProjectSubscriber.js';
+import publishUserEventToTopicAsync from './kafkaUserPublisher.js';
 
 export {
-    connectKafkaAsync,
-    disconnectKafkaAsync,
-    startKafkaSubscriptionsAsync,
+    connectKafkaUserProducerAsync,
+    disconnectKafkaUserProducerAsync,
+    connectKafkaProjectConsumerAsync,
+    disconnectKafkaProjectConsumerAsync,
+    startKafkaProjectSubscriptionsAsync,
+    publishUserEventToTopicAsync,
 };

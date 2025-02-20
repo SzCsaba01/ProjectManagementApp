@@ -1,6 +1,6 @@
 .task-container {
     width: 80%;
-    height: 20%;
+    height: 10%;
     display: flex;
     border-radius: 0.5rem;
     border: 0.1rem solid var(--light-gray-color);

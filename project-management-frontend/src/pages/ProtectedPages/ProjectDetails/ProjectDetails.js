@@ -9,6 +9,7 @@ import {
 import useRoles from '../../../hooks/useRoles.hook';
 import CustomIcon from '../../../components/icon/CustomIcon';
 import ConfirmationPopup from '../../../components/confirmationPopup/ConfirmationPopup';
+import { deleteProject } from '../../../services/project.service';
 
 const ProjectDetails = () => {
     const navigate = useNavigate();
@@ -41,8 +42,8 @@ const ProjectDetails = () => {
         });
     };
 
-    const handleDelete = () => {
-        console.log('delete project');
+    const handleDelete = async () => {
+        await deleteProject(projectDetails.projectId);
         setShowConfirmation(false);
     };
 

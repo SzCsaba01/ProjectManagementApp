@@ -105,3 +105,19 @@ h1 {
 .fa-lightbulb {
     color: var(--icon-backlog-status-color-in-planning);
 }
+
+.fa-plus {
+    color: var(--primary-color);
+}
+
+.fa-flag {
+    color: var(--danger-color);
+}
+
+.fa-edit {
+    color: var(--primary-color);
+}
+
+.fa-trash {
+    color: var(--danger-color);
+}

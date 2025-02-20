@@ -11,6 +11,16 @@
     background-color: var(--hover-light-gray-color);
 }
 
+.dropbox.disabled {
+    pointer-events: none;
+    cursor: default;
+    background-color: var(--layout-background);
+}
+
+.dropbox.disabled:hover {
+    background-color: var(--layout-background);
+}
+
 .file-previews {
     display: flex;
     align-items: center;

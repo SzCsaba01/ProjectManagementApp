@@ -7,25 +7,33 @@ class TaskRepository {
     }
 
     async getCurrentSprintTasksBySprintIdAsync(sprintId) {
+        return await Task.find({
+            sprintId: sprintId,
+            backlogStatus: BacklogStatus.CurrentSprint.description,
+        }).sort({ index: 1 });
+    }
+
+    async getTasksBySprintIdAsync(sprintId) {
         return await Task.find({ sprintId: sprintId }).sort({ index: 1 });
     }
 
-    async getCurrentSprintTasksByBacklogIdAsync(backlogId) {
-        return await Task.find({
-            backlogId: backlogId,
-            backlogStatus: BacklogStatus.CurrentSprint.description,
-        });
+    async getAllTasksByBacklogIdAsync(backlogId) {
+        return await Task.find({ backlogId: backlogId });
     }
 
     async getTasksByBacklogIdAsync(backlogId) {
-        return await Task.find({ backlogId: backlogId }).sort({ index: 1 });
+        return await Task.find({
+            backlogId: backlogId,
+            sprintEnded: false,
+        }).sort({ index: 1 });
     }
 
-    async getFinishedTasksBySprintId(sprintId) {
-        return await Task.find({
-            sprintId: sprintId,
-            status: TaskStatus.Completed.description,
-        });
+    async getTasksByAssigneeIdAsync(assigneId) {
+        return await Task.find({ assigneeId: assigneId });
+    }
+
+    async getTasksByCreatorIdAsync(creatorId) {
+        return await Task.find({ creatorId: creatorId });
     }
 
     async updateTaskAsync(task) {
@@ -52,6 +60,18 @@ class TaskRepository {
         }));
 
         return await Task.bulkWrite(bulkOps);
+    }
+
+    async deleteTaskByIdAsync(taskId) {
+        return await Task.findOneAndDelete({ _id: taskId });
+    }
+
+    async deleteTasksByBacklogIdAsync(backlogId) {
+        return await Task.deleteMany({ backlogId: backlogId });
+    }
+
+    async deleteTasksBySprintIdAsync(sprintId) {
+        return await Task.deleteMany({ sprintId: sprintId });
     }
 }
 

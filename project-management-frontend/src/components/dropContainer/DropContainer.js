@@ -30,7 +30,6 @@ const DropContainer = ({
                         key={task._id}
                         id={task._id}
                         task={task}
-                        containerName={containerName}
                     />
                 ))}
             </div>

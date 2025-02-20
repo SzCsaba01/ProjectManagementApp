@@ -25,6 +25,13 @@ class ProjectRepository {
         return await Project.find({ ownerId: ownerId });
     }
 
+    async getOtherOwnerIdAsync(userId) {
+        return await Project.findOne({ ownerId: { $ne: userId } })
+            .select('ownerId')
+            .lean()
+            .then((project) => project?.ownerId || null);
+    }
+
     async updateProjectAsync(project) {
         const { _id, ...projectWithoutId } = project;
         return await Project.findOneAndUpdate(
@@ -34,6 +41,17 @@ class ProjectRepository {
             projectWithoutId,
             { new: true, runValidators: true },
         );
+    }
+
+    async updateProjectsAsync(projects) {
+        const bulkOps = projects.map((project) => ({
+            updateOne: {
+                filter: { _id: project._id },
+                update: { $set: project },
+            },
+        }));
+
+        return await Project.bulkWrite(bulkOps);
     }
 
     async deleteProjectByProjectIdAsync(projectId) {

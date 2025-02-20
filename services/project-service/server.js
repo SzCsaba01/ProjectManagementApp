@@ -1,11 +1,11 @@
 import { app, container } from './app.js';
 import { connectDB } from './src/config/index.js';
 import {
-    connectKafkaConsumerAsync,
-    disconnectKafkaConsumerAsync,
-    connectKafkaProducerAsync,
-    disconnectKafkaProducerAsync,
-    startKafkaSubscriptionsAsync,
+    connectKafkaUserConsumerAsync,
+    disconnectKafkaUserConsumerAsync,
+    connectKafkaProjectProducerAsync,
+    disconnectKafkaProjectProducerAsync,
+    startKafkaUserSubscriptionsAsync,
 } from './src/kafka/index.js';
 
 const port = process.env.PORT || 3000;
@@ -14,9 +14,9 @@ const startServer = async () => {
     try {
         await connectDB();
 
-        await connectKafkaProducerAsync();
-        await connectKafkaConsumerAsync();
-        // await startKafkaSubscriptionsAsync(container);
+        await connectKafkaProjectProducerAsync();
+        await connectKafkaUserConsumerAsync();
+        await startKafkaUserSubscriptionsAsync(container);
 
         app.listen(port, () => {
             console.log(`Server is running on http://localhost:${port}`);
@@ -32,8 +32,8 @@ startServer();
 process.on('SIGINT', async () => {
     console.log('Received SIGINT. Shutting down...');
     try {
-        await disconnectKafkaProducerAsync();
-        await disconnectKafkaConsumerAsync();
+        await disconnectKafkaProjectProducerAsync();
+        await disconnectKafkaUserConsumerAsync();
         console.log('Express server closed.');
         process.exit(0);
     } catch (error) {
@@ -45,8 +45,8 @@ process.on('SIGINT', async () => {
 process.on('SIGTERM', async () => {
     console.log('Received SIGTERM. Shutting down...');
     try {
-        await disconnectKafkaConsumerAsync();
-        await disconnectKafkaProducerAsync();
+        await disconnectKafkaUserConsumerAsync();
+        await disconnectKafkaProjectProducerAsync();
 
         console.log('Express server closed.');
         process.exit(0);

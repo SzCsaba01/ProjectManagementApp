@@ -7,13 +7,14 @@ import { logger, corsOptions } from './src/config/index.js';
 import proxyRoutes from './src/routes/proxy.route.js';
 import { errorHandlerMiddleware } from './src/middlewares/index.js';
 import cookieParser from 'cookie-parser';
+import http from 'http';
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
 
 app.use(cookieParser());
-
 app.use(cors(corsOptions()));
 app.use(helmet());
 app.use(
@@ -23,7 +24,7 @@ app.use(
 );
 app.disable('x-powered-by');
 
-proxyRoutes(app);
+proxyRoutes(app, server);
 
 app.use(errorHandlerMiddleware);
 
@@ -31,8 +32,8 @@ const port = process.env.PORT || 5000;
 
 const startServer = async () => {
     try {
-        app.listen(port, () => {
-            console.log(`Server is running on http://localhost:${port}`);
+        server.listen(port, () => {
+            console.log(`API Gateway is running on http://localhost:${port}`);
         });
     } catch (error) {
         console.error('Error starting the server:', error);

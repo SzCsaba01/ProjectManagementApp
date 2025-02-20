@@ -9,15 +9,7 @@ class BacklogRepository {
         return await Backlog.findOne({ _id: backlogId });
     }
 
-    async findAndUpdateBacklog(newBacklogData) {
-        const { _id, ...backlogWithoutId } = newBacklogData;
-        return await Backlog.findOneAndUpdate({ _id: _id }, newBacklogData, {
-            new: true,
-            runValidators: true,
-        });
-    }
-
-    async deleteBacklogByBacklogIdAsync(backlogId) {
+    async deleteBacklogByIdAsync(backlogId) {
         return await Backlog.deleteOne({ _id: backlogId });
     }
 }

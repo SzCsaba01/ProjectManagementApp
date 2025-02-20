@@ -96,3 +96,8 @@ export const setSelectedProject = async (projectId, userId) => {
         userId: userId,
     });
 };
+
+//DELETE
+export const deleteUser = async (userId) => {
+    await api.delete('/user/delete-user', { data: { userId: userId } });
+};

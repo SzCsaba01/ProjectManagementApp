@@ -4,7 +4,7 @@ import FileViewerModal from '../fileViewerModal/FileViewerModal';
 import CustomIcon from '../icon/CustomIcon';
 import './CustomFileDropBox.css';
 
-const CustomFileDropBox = ({ files, setFiles }) => {
+const CustomFileDropBox = ({ files, setFiles, disabled = false }) => {
     const [selectedFile, setSelectedFile] = useState(null);
 
     const onDrop = (acceptedFiles) => {
@@ -47,10 +47,10 @@ const CustomFileDropBox = ({ files, setFiles }) => {
             <div
                 {...getRootProps()}
                 onDragStart={preventDrag}
-                className="dropbox"
+                className={`dropbox ${disabled ? 'disabled' : ''}`}
             >
-                <input {...getInputProps()} />
-                {!files?.length && (
+                <input {...getInputProps()} disabled={disabled} />
+                {!files?.length && !disabled && (
                     <p>Drag & Drop files here, or click to select files</p>
                 )}
                 <div className="file-previews">

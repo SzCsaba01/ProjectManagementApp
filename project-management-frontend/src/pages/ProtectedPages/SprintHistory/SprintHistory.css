@@ -1,0 +1,27 @@
+.sprint-history-overlay {
+    width: 100%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sprint-history-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.sprint-history-list {
+    width: 100%;
+    height: 100%;
+    background-color: var(--white-color);
+    box-shadow: 0.5rem 0.5rem 2rem var(--shadow);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 2rem;
+    max-height: 65vh;
+}

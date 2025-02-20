@@ -8,7 +8,7 @@ import CustomInput from '../input/CustomInput';
 import CustomDatePicker from '../datePicker/CustomDatePicker';
 import CustomButton from '../button/CustomButton';
 
-const EditSprintModal = ({ sprint, onClose }) => {
+const EditSprintModal = ({ sprint, onUpdateSprint, onClose }) => {
     const validationSchema = yup.object().shape({
         name: yup
             .string()
@@ -16,7 +16,13 @@ const EditSprintModal = ({ sprint, onClose }) => {
             .min(3, 'Sprint name must be atelast 3 characters')
             .max(100, 'Sprint name can be most 100 caracters long'),
         startDate: yup.date().required('Start date is required'),
-        plannedEndDate: yup.date().required('Planned end date is required'),
+        plannedEndDate: yup
+            .date()
+            .required('Planned end date is required')
+            .min(
+                yup.ref('startDate'),
+                'Planned end date cannot be before the start date',
+            ),
     });
 
     const {
@@ -30,13 +36,15 @@ const EditSprintModal = ({ sprint, onClose }) => {
     } = useForm({
         resolver: yupResolver(validationSchema),
         mode: 'onChange',
+        defaultValues: sprint,
     });
 
     const startDate = watch('startDate');
 
     const handleDateChange = (field, value) => {
         setValue(field, value);
-        trigger(field);
+        trigger('startDate');
+        trigger('plannedEndDate');
 
         if (field === 'startDate' && !value) {
             setValue('plannedEndDate', null);
@@ -44,17 +52,19 @@ const EditSprintModal = ({ sprint, onClose }) => {
     };
 
     const onSubmit = async (data) => {
-        console.log(data);
-        // await updateSprint(data);
-        console.log(sprint);
+        onUpdateSprint(data);
+        await updateSprint(data);
     };
+
+    const formValues = watch();
+    const hasChanges = JSON.stringify(formValues) !== JSON.stringify(sprint);
 
     return (
         <div className="modal-overlay">
             <div className="edit-sprint-modal-container">
                 <div className="edit-sprint-modal">
                     <div className="edit-sprint-modal-header">
-                        <h1>Create Sprint</h1>
+                        <h1>Edit Sprint</h1>
                         <CustomIcon
                             name="times"
                             size="large"
@@ -92,6 +102,11 @@ const EditSprintModal = ({ sprint, onClose }) => {
                                     />
                                 )}
                             />
+                            <span
+                                className={`input-error-message ${errors.startDate ? 'visible' : ''}`}
+                            >
+                                {errors.startDate?.message}
+                            </span>
                         </div>
                         <div className="form-group">
                             <label>Planned End Date</label>
@@ -113,9 +128,17 @@ const EditSprintModal = ({ sprint, onClose }) => {
                                     />
                                 )}
                             />
+                            <span
+                                className={`input-error-message ${errors.plannedEndDate ? 'visible' : ''}`}
+                            >
+                                {errors.plannedEndDate?.message}
+                            </span>
                         </div>
                         <div className="form-footer">
-                            <CustomButton type="primary" disabled={!isValid}>
+                            <CustomButton
+                                type="primary"
+                                disabled={!hasChanges || !isValid}
+                            >
                                 Save Sprint
                             </CustomButton>
                         </div>

@@ -1,8 +1,9 @@
 import './Backlog.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DropContainer from '../../../components/dropContainer/DropContainer';
 import CustomIcon from '../../../components/icon/CustomIcon';
 import {
+    deleteTask,
     getTasksByBacklogId,
     updateTasksIndex,
 } from '../../../services/task.service';
@@ -21,8 +22,17 @@ import TaskCard from '../../../components/taskCard/TaskCard';
 import TaskDetails from '../../../components/taskDetails/TaskDetails';
 import CreateSprintModal from '../../../components/createSprintModal/CreateSprintModal';
 import { useSelector } from 'react-redux';
+import useWebSocket from '../../../hooks/useWebSocket';
+import { useNavigate } from 'react-router-dom';
 
 const Backlog = () => {
+    const navigate = useNavigate();
+
+    const { userId } = useSelector((state) => state.user);
+    const { projectId, backlogId, currentSprintId } = useSelector(
+        (state) => state.project,
+    );
+
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
     const [isCreateSprintModalOpen, setIsCreateSprintModalOpen] =
         useState(false);
@@ -31,6 +41,12 @@ const Backlog = () => {
         CurrentSprint: [],
         Blocked: [],
     });
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [draggingItem, setDraggingItem] = useState(null);
+
+    const containersRef = useRef(containers);
+    const usersRef = useRef(users);
+    const selectedTaskRef = useRef(selectedTask);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -38,13 +54,6 @@ const Backlog = () => {
                 distance: 10,
             },
         }),
-    );
-
-    const [selectedTask, setSelectedTask] = useState(null);
-
-    const [draggingItem, setDraggingItem] = useState(null);
-    const { projectId, backlogId, currentSprintId } = useSelector(
-        (state) => state.project,
     );
 
     useEffect(() => {
@@ -70,9 +79,74 @@ const Backlog = () => {
 
             setContainers(groupedTasks);
             setUsers(allUsers);
+            containersRef.current = groupedTasks;
         };
-        fetchData();
+        if (projectId && backlogId) {
+            fetchData();
+        }
     }, [projectId, backlogId]);
+
+    useEffect(() => {
+        usersRef.current = users;
+    }, [users]);
+
+    useEffect(() => {
+        selectedTaskRef.current = selectedTask;
+    }, [selectedTask]);
+
+    const handleMessage = (message) => {
+        switch (message.type) {
+            case 'UPDATE_TASK': {
+                handleUpdateTask(message.task);
+                break;
+            }
+            case 'UPDATE_TASKS': {
+                const updatedTasks = message.tasks;
+                if (selectedTask) {
+                    const currentlySelectedTask = updatedTasks.find(
+                        (task) => task._id === selectedTaskRef._id,
+                    );
+                    if (currentlySelectedTask) {
+                        setSelectedTask(currentlySelectedTask);
+                    }
+                }
+                setContainers((prev) => {
+                    const oldDraggedTaskContainer = findContainer(
+                        message.draggedTaskId,
+                    );
+
+                    const filteredTasks = prev[oldDraggedTaskContainer].filter(
+                        (task) => task._id !== message.draggedTaskId,
+                    );
+
+                    containersRef.current = {
+                        ...prev,
+                        [oldDraggedTaskContainer]: filteredTasks,
+                        [updatedTasks[0].backlogStatus]: updatedTasks,
+                    };
+
+                    return {
+                        ...prev,
+                        [oldDraggedTaskContainer]: filteredTasks,
+                        [updatedTasks[0].backlogStatus]: updatedTasks,
+                    };
+                });
+                break;
+            }
+            default: {
+                console.error('Invalid message');
+                break;
+            }
+        }
+    };
+
+    const { sendMessage } = useWebSocket(
+        `${process.env.REACT_APP_WS_BACKEND_APP_API_URL}`,
+        'BACKLOG',
+        backlogId,
+        userId,
+        handleMessage,
+    );
 
     const handleChangeCreateTaskModalStatus = () => {
         setIsCreateTaskModalOpen(!isCreateTaskModalOpen);
@@ -110,32 +184,26 @@ const Backlog = () => {
             activeTask.backlogStatus = overContainer;
         }
 
-        setContainers((prev) => {
-            const containerTasks = prev[overContainer];
-            const activeIndex = containerTasks.findIndex(
-                (task) => task._id === activeId,
-            );
-            const overIndex = containerTasks.findIndex(
-                (task) => task._id === overId,
-            );
+        const containerTasks = containers[overContainer];
+        const activeIndex = containerTasks.findIndex(
+            (task) => task._id === activeId,
+        );
+        const overIndex = containerTasks.findIndex(
+            (task) => task._id === overId,
+        );
 
-            const reorderedTasks = arrayMove(
-                containerTasks,
-                activeIndex,
-                overIndex,
-            );
+        const reorderedTasks = arrayMove(
+            containerTasks,
+            activeIndex,
+            overIndex,
+        );
 
-            reorderedTasks.forEach((task, index) => {
-                task.index = index;
-            });
-
-            handleUpdateTasksIndex(reorderedTasks);
-
-            return {
-                ...prev,
-                [overContainer]: reorderedTasks,
-            };
+        reorderedTasks.forEach((task, index) => {
+            task.index = index;
         });
+
+        handleUpdateTasksIndex(reorderedTasks, draggingItem.taskId);
+        setDraggingItem(null);
     };
 
     const handleDragStart = (event) => {
@@ -177,6 +245,11 @@ const Backlog = () => {
 
             const updatedOverContainer = [...prev[overContainer], activeTask];
 
+            containersRef.current = {
+                ...prev,
+                [activeContainer]: updatedActiveContainer,
+                [overContainer]: updatedOverContainer,
+            };
             return {
                 ...prev,
                 [activeContainer]: updatedActiveContainer,
@@ -191,24 +264,29 @@ const Backlog = () => {
     };
 
     const findContainer = (id) => {
-        if (id in containers) {
+        if (id in containersRef.current) {
             return id;
         }
-        return Object.keys(containers).find((container) =>
-            containers[container].some((task) => task._id === id),
+        return Object.keys(containersRef.current).find((container) =>
+            containersRef.current[container].some((task) => task._id === id),
         );
     };
 
     const findTask = (containerName, taskId) => {
-        const task = containers[containerName].find(
+        const task = containersRef.current[containerName].find(
             (task) => task._id === taskId,
         );
         return task;
     };
 
-    const handleUpdateTasksIndex = async (tasks) => {
-        console.log('test');
-        await updateTasksIndex(tasks, currentSprintId);
+    const handleUpdateTasksIndex = async (tasks, draggedTaskId) => {
+        await updateTasksIndex(
+            tasks,
+            draggedTaskId,
+            'BACKLOG',
+            currentSprintId,
+            backlogId,
+        );
     };
 
     const handleTaskClick = (task) => {
@@ -220,141 +298,188 @@ const Backlog = () => {
     };
 
     const handleUpdateTask = (updatedTask) => {
-        updatedTask.assignee = users.find(
+        const prevTaskContainer = findContainer(updatedTask._id);
+
+        updatedTask.assignee = usersRef.current.find(
             (user) => user.userId === updatedTask.assigneeId,
         );
-        updatedTask.creator = users.find(
+        updatedTask.creator = usersRef.current.find(
             (user) => user.userId === updatedTask.creatorId,
         );
 
         setContainers((prevContainers) => {
             const newContainers = { ...prevContainers };
 
-            newContainers[updatedTask.backlogStatus] = newContainers[
-                updatedTask.backlogStatus
+            newContainers[prevTaskContainer] = newContainers[
+                prevTaskContainer
             ].filter((task) => task._id !== updatedTask._id);
+
             newContainers[updatedTask.backlogStatus].push(updatedTask);
+
+            containersRef.current = newContainers;
 
             return newContainers;
         });
-        setSelectedTask(updatedTask);
+        if (selectedTaskRef.current) {
+            setSelectedTask(updatedTask);
+        }
     };
 
-    return (
-        <>
-            <DndContext
-                sensors={sensors}
-                onDragEnd={handleDragEnd}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-            >
-                <div className="backlog-overlay">
-                    <h1>Backlog</h1>
-                    <div className="backlog-container">
-                        <div className="backlog-board">
-                            <div
-                                className={`backlog-actions ${currentSprintId ? 'single' : ''}`}
-                            >
-                                {!currentSprintId && (
+    const handleOnDelete = async (task) => {
+        await deleteTask(task._id);
+        setSelectedTask(null);
+        setContainers((prev) => {
+            const filteredContainer = prev[task.backlogStatus].filter(
+                (containerTask) => containerTask._id !== task._id,
+            );
+
+            containersRef.current = {
+                ...prev,
+                [task.backlogStatus]: filteredContainer,
+            };
+
+            return {
+                ...prev,
+                [task.backlogStatus]: filteredContainer,
+            };
+        });
+    };
+
+    if (!projectId) {
+        return (
+            <div>
+                {' '}
+                <h2>There's no selected project</h2>
+            </div>
+        );
+    } else {
+        return (
+            <>
+                <DndContext
+                    sensors={sensors}
+                    onDragEnd={handleDragEnd}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                >
+                    <div className="backlog-overlay">
+                        <h1>Backlog</h1>
+                        <div className="backlog-container">
+                            <div className="backlog-board">
+                                <div
+                                    className={`backlog-actions ${currentSprintId ? 'single' : ''}`}
+                                >
+                                    {!currentSprintId && (
+                                        <div
+                                            className="create-section"
+                                            onClick={
+                                                handleChangeCreateSprintModalStatus
+                                            }
+                                        >
+                                            <CustomIcon
+                                                name="plus"
+                                                size="medium"
+                                            />
+                                            <span>Create Sprint</span>
+                                        </div>
+                                    )}
                                     <div
                                         className="create-section"
                                         onClick={
-                                            handleChangeCreateSprintModalStatus
+                                            handleChangeCreateTaskModalStatus
                                         }
                                     >
                                         <CustomIcon name="plus" size="medium" />
-                                        <span>Create Sprint</span>
+                                        <span>Create Task</span>
                                     </div>
-                                )}
-                                <div
-                                    className="create-section"
-                                    onClick={handleChangeCreateTaskModalStatus}
-                                >
-                                    <CustomIcon name="plus" size="medium" />
-                                    <span>Create Task</span>
                                 </div>
-                            </div>
-                            <div className="task-drop-containers">
-                                {Object.keys(containers).map(
-                                    (containerName) => (
-                                        <div
-                                            key={containerName}
-                                            className="task-drop-container"
-                                        >
-                                            <div className="container-title">
-                                                <CustomIcon
-                                                    name={
-                                                        BacklogStatus[
+                                <div className="task-drop-containers">
+                                    {Object.keys(containers).map(
+                                        (containerName) => (
+                                            <div
+                                                key={containerName}
+                                                className="task-drop-container"
+                                            >
+                                                <div className="container-title">
+                                                    <CustomIcon
+                                                        name={
+                                                            BacklogStatus[
+                                                                containerName
+                                                            ].icon
+                                                        }
+                                                    />
+                                                    <h3 className="container-name">
+                                                        {
+                                                            BacklogStatus[
+                                                                containerName
+                                                            ].label
+                                                        }
+                                                    </h3>
+                                                </div>
+                                                <DropContainer
+                                                    containerName={
+                                                        containerName
+                                                    }
+                                                    tasks={
+                                                        containers[
                                                             containerName
-                                                        ].icon
+                                                        ]
+                                                    }
+                                                    handleTaskClick={
+                                                        handleTaskClick
                                                     }
                                                 />
-                                                <h3 className="container-name">
-                                                    {
-                                                        BacklogStatus[
-                                                            containerName
-                                                        ].label
-                                                    }
-                                                </h3>
                                             </div>
-                                            <DropContainer
-                                                containerName={containerName}
-                                                tasks={
-                                                    containers[containerName]
-                                                }
-                                                handleTaskClick={
-                                                    handleTaskClick
-                                                }
-                                            />
-                                        </div>
-                                    ),
-                                )}
+                                        ),
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        {selectedTask && (
-                            <TaskDetails
-                                users={users}
-                                onClose={handleCloseTaskDetails}
-                                task={selectedTask}
-                                onTaskModified={handleUpdateTask}
-                                backlogId={backlogId}
-                            />
-                        )}
-                    </div>
-                </div>
-                <DragOverlay
-                    dropAnimation={{
-                        duration: 200,
-                        easing: 'ease',
-                    }}
-                >
-                    {draggingItem ? (
-                        <TaskCard
-                            id={draggingItem.taskid}
-                            isDragging={true}
-                            task={findTask(
-                                draggingItem.container,
-                                draggingItem.taskId,
+                            {selectedTask && (
+                                <TaskDetails
+                                    users={users}
+                                    onClose={handleCloseTaskDetails}
+                                    sprintId={currentSprintId}
+                                    type="BACKLOG"
+                                    task={selectedTask}
+                                    backlogId={backlogId}
+                                    onDelete={handleOnDelete}
+                                />
                             )}
-                        />
-                    ) : null}
-                </DragOverlay>
-            </DndContext>
-            {isCreateTaskModalOpen && (
-                <CreateTaskModal
-                    onClose={handleChangeCreateTaskModalStatus}
-                    users={users}
-                    onTaskCreated={handleTaskCreated}
-                />
-            )}
-            {isCreateSprintModalOpen && !currentSprintId && (
-                <CreateSprintModal
-                    backlogId={backlogId}
-                    onClose={handleChangeCreateSprintModalStatus}
-                />
-            )}
-        </>
-    );
+                        </div>
+                    </div>
+                    <DragOverlay
+                        dropAnimation={{
+                            duration: 200,
+                            easing: 'ease',
+                        }}
+                    >
+                        {draggingItem ? (
+                            <TaskCard
+                                id={draggingItem.taskId}
+                                isDragging={true}
+                                task={findTask(
+                                    draggingItem.container,
+                                    draggingItem.taskId,
+                                )}
+                            />
+                        ) : null}
+                    </DragOverlay>
+                </DndContext>
+                {isCreateTaskModalOpen && (
+                    <CreateTaskModal
+                        onClose={handleChangeCreateTaskModalStatus}
+                        users={users}
+                        onTaskCreated={handleTaskCreated}
+                    />
+                )}
+                {isCreateSprintModalOpen && !currentSprintId && (
+                    <CreateSprintModal
+                        backlogId={backlogId}
+                        onClose={handleChangeCreateSprintModalStatus}
+                    />
+                )}
+            </>
+        );
+    }
 };
 
 export default Backlog;

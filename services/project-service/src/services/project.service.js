@@ -1,9 +1,11 @@
-import { publishEventToTopic } from '../kafka/index.js';
+import NotFoundError from '../errors/notFound.error.js';
+import { publishProjectEventToTopicAsync } from '../kafka/index.js';
 
 class ProjectService {
-    constructor({ projectRepository, backlogRepository }) {
+    constructor({ projectRepository, backlogRepository, sprintRepository }) {
         this.projectRepository = projectRepository;
         this.backlogRepository = backlogRepository;
+        this.sprintRepository = sprintRepository;
     }
 
     async createProjectAsync(newProjectData) {
@@ -21,7 +23,7 @@ class ProjectService {
             userIds: [newProjectData.ownerId, ...newProjectData.userIds],
             projectId: project._id,
         };
-        await publishEventToTopic(
+        await publishProjectEventToTopicAsync(
             process.env.KAFKA_ADD_USERS_TO_PROJECT_TOPIC,
             addUsersToProjectData,
         );
@@ -37,14 +39,17 @@ class ProjectService {
         const projectWithDetails =
             await this.projectRepository.getProjectByProjectIdAsync(projectId);
 
-        const project = {
-            name: projectWithDetails.name,
-            backlogId: projectWithDetails.backlog,
-            currentSprintId: projectWithDetails.currentSprint,
-            finishedSprintIds: projectWithDetails.finishedSprints,
-        };
+        if (projectWithDetails) {
+            const project = {
+                name: projectWithDetails.name,
+                backlogId: projectWithDetails.backlog,
+                currentSprintId: projectWithDetails.currentSprint,
+                finishedSprintIds: projectWithDetails.finishedSprints,
+            };
 
-        return project;
+            return project;
+        }
+        throw new NotFoundError('Project not found!');
     }
 
     async getProjectsByMemberIdAsync(memberId) {
@@ -53,6 +58,7 @@ class ProjectService {
 
         return projects;
     }
+
     async getProjectsByOwnerIdAsync(ownerId) {
         const project =
             await this.projectRepository.getProjectsByOnwerIdAsync(ownerId);
@@ -87,7 +93,7 @@ class ProjectService {
                 projectId: oldProject._id,
             };
 
-            await publishEventToTopic(
+            await publishProjectEventToTopicAsync(
                 process.env.KAFKA_REMOVE_USERS_FROM_PROJECT_TOPIC,
                 removeUsersFromProjectData,
             );
@@ -99,9 +105,37 @@ class ProjectService {
                 projectId: oldProject._id,
             };
 
-            await publishEventToTopic(
+            await publishProjectEventToTopicAsync(
                 process.env.KAFKA_ADD_USERS_TO_PROJECT_TOPIC,
                 addUsersToProjectData,
+            );
+        }
+    }
+
+    async removeUserFromProjectsAsync(userId) {
+        const userMemberProjects =
+            await this.projectRepository.getProjectsByMemberIdAsync(userId);
+        const userOwnerProjects =
+            await this.projectRepository.getProjectsByOwnerIdAsync(userId);
+
+        userMemberProjects.forEach((project) => {
+            project.userIds = project.userIds.filter((id) => userId !== id);
+        });
+
+        if (userOwnerProjects.length > 0) {
+            const otherOwnerId =
+                await this.projectRepository.getOtherOwnerIdAsync(userId);
+
+            userOwnerProjects.forEach((project) => {
+                project.ownerId = otherOwnerId;
+            });
+
+            await this.projectRepository.updateProjectsAsync(userOwnerProjects);
+        }
+
+        if (userMemberProjects.length > 0) {
+            await this.projectRepository.updateProjectsAsync(
+                userMemberProjects,
             );
         }
     }
@@ -113,14 +147,31 @@ class ProjectService {
             );
 
         const removeUsersFromProjectData = {
-            userIds: [ownerId, ...deletedProject.userIds],
+            userIds: [deletedProject.ownerId, ...deletedProject.userIds],
             projectId: deletedProject._id,
         };
 
-        await publishEventToTopic(
+        await publishProjectEventToTopicAsync(
             process.env.KAFKA_REMOVE_USERS_FROM_PROJECT_TOPIC,
             removeUsersFromProjectData,
         );
+
+        const removeTasksByBacklogIdData = {
+            backlogId: deletedProject.backlog,
+        };
+
+        await publishProjectEventToTopicAsync(
+            process.env.KAFKA_DELETE_PROJECT_TOPIC,
+            removeTasksByBacklogIdData,
+        );
+
+        await this.backlogRepository.deleteBacklogByIdAsync(
+            deletedProject.backlog,
+        );
+        await this.sprintRepository.deleteSprintsByIdsAsync([
+            ...deletedProject.finishedSprints,
+            deletedProject.currentSprint,
+        ]);
     }
 }
 

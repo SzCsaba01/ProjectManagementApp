@@ -14,7 +14,7 @@
     flex-direction: row;
 }
 
-.backlog-board {
+.backlog-container .backlog-board {
     display: flex;
     background-color: var(--white-color);
     width: 100%;
@@ -24,46 +24,52 @@
     padding: 1rem;
 }
 
-.backlog-actions {
+.backlog-container .backlog-actions {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
-.backlog-actions.single {
+.backlog-container .backlog-actions.single {
     justify-content: end;
 }
 
-.create-section {
+.backlog-container .create-section {
     display: flex;
     gap: 0.5rem;
     padding: 0.25rem 0.5rem;
-}
-
-.create-section:hover {
-    cursor: pointer;
-    background-color: var(--light-gray-color);
-    transition: background-color 0.3s ease;
     border-radius: 0.3rem;
 }
 
-.task-drop-containers {
+.backlog-container .create-section:hover {
+    cursor: pointer;
+    background-color: var(--light-gray-color);
+    transition: background-color 0.3s ease;
+}
+
+.backlog-container .task-drop-containers {
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
 }
 
-.task-drop-container {
+.backlog-container .task-drop-container {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 20rem;
+    height: 100%;
+    min-height: 20rem;
 }
 
-.container-title {
+.backlog-container .container-title {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 1rem;
+    justify-content: flex-start;
+}
+
+.backlog-container .task-container {
+    height: 2.5rem !important;
 }

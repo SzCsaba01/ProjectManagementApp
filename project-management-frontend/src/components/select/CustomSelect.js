@@ -12,6 +12,7 @@ const CustomSelect = forwardRef(
             onChange,
             name,
             className = '',
+            disabled = false,
         },
         ref,
     ) => {
@@ -79,6 +80,7 @@ const CustomSelect = forwardRef(
                 isClearable
                 isSearchable={false}
                 className={className}
+                isDisabled={disabled}
             />
         );
     },

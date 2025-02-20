@@ -54,6 +54,17 @@ const taskSchema = new mongoose.Schema({
         required: true,
         default: TaskStatus.NotStarted.description,
     },
+    storyPoints: {
+        type: Number,
+        default: null,
+        validate: {
+            validator: function (value) {
+                return value >= 0 && value % 0.5 === 0;
+            },
+            message: (props) =>
+                `${props.value} is not a valid story point. It must be a non-negative number in increments of 0.5.`,
+        },
+    },
     backlogId: {
         type: String,
         index: true,
@@ -68,15 +79,23 @@ const taskSchema = new mongoose.Schema({
     },
     plannedAt: {
         type: Date,
+        default: null,
     },
     startedAt: {
         type: Date,
+        default: null,
     },
     completedAt: {
         type: Date,
+        default: null,
     },
     finishedAt: {
         type: Date,
+        default: null,
+    },
+    sprintEnded: {
+        type: Boolean,
+        default: false,
     },
     updatedAt: {
         type: Date,

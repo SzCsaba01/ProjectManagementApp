@@ -71,6 +71,18 @@ const CreateTaskModal = ({ users, onClose, onTaskCreated }) => {
                 'Invalid backlog status selected',
             )
             .required('Please select backlog status'),
+        storyPoints: yup
+            .number()
+            .transform((value, originalValue) =>
+                originalValue === '' ? null : value,
+            )
+            .nullable(true)
+            .min(0, 'Story points must be non-negative')
+            .test(
+                'is-multiple-of-0.5',
+                'Story points must be in increments of 0.5',
+                (value) => value !== undefined && value % 0.5 === 0,
+            ),
         attachments: yup
             .array()
             .max(5, 'You can upload a maximum of 5 files.')
@@ -169,6 +181,7 @@ const CreateTaskModal = ({ users, onClose, onTaskCreated }) => {
         formData.append('category', data.category);
         formData.append('priority', data.priority);
         formData.append('backlogStatus', data.backlogStatus);
+        formData.append('storyPoints', data.storyPoints);
         formData.append('creatorId', userId);
         formData.append('backlogId', backlogId);
         formData.append('sprintId', currentSprintId);
@@ -254,7 +267,6 @@ const CreateTaskModal = ({ users, onClose, onTaskCreated }) => {
                                 {errors.backlogStatus?.message}
                             </span>
                         </div>
-
                         <div className="form-group">
                             <label htmlFor="category">Category</label>
                             <Controller
@@ -344,7 +356,21 @@ const CreateTaskModal = ({ users, onClose, onTaskCreated }) => {
                                 {errors.backlogStatus?.message}
                             </span>
                         </div>
-
+                        <div className="form-group">
+                            <label htmlFor="storyPoints">Story Points </label>
+                            <CustomInput
+                                type="number"
+                                step="0.5"
+                                id="storyPoints"
+                                error={errors.storyPoints}
+                                {...register('storyPoints')}
+                            />
+                            <span
+                                className={`input-error-message ${errors.storyPoints ? 'visible' : ''}`}
+                            >
+                                {errors.storyPoints?.message}
+                            </span>
+                        </div>
                         <div className="form-group">
                             <label htmlFor="attachments">Attachments</label>
                             <CustomFileDropBox
@@ -357,7 +383,6 @@ const CreateTaskModal = ({ users, onClose, onTaskCreated }) => {
                                 {errors.attachments?.message}
                             </span>
                         </div>
-
                         <div className="form-footer">
                             <CustomButton type="primary" disabled={!isValid}>
                                 Create Task

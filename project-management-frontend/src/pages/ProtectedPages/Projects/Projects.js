@@ -1,15 +1,22 @@
 import { useState, useEffect } from 'react';
 import './Projects.css';
 import usePermissions from '../../../hooks/usePermissions.hook';
-import { MANAGE_ACTION, PROJECT_RESOURCE } from '../../../utils/constants.util';
+import {
+    ADMIN_ROLE,
+    MANAGER_ROLE,
+    MANAGE_ACTION,
+    PROJECT_RESOURCE,
+} from '../../../utils/constants.util';
 import {
     getAllProjects,
     getProjectsByMemberId,
+    getProjectsByOwnerId,
 } from '../../../services/project.service';
 import { useSelector } from 'react-redux';
 import CustomIcon from '../../../components/icon/CustomIcon';
 import { NavLink } from 'react-router-dom';
 import ProjectCard from '../../../components/projectCard/ProjectCard';
+import useRoles from '../../../hooks/useRoles.hook';
 
 const Projects = () => {
     const [projects, setProjects] = useState(null);
@@ -22,20 +29,26 @@ const Projects = () => {
         },
     ]);
 
+    const hasAdminRole = useRoles([ADMIN_ROLE]);
+    const hasManagerRole = useRoles([MANAGER_ROLE]);
+
     useEffect(() => {
         const fetchProjects = async () => {
-            if (hasManageProjectsPermission) {
+            if (hasAdminRole) {
                 const projects = await getAllProjects();
-
+                setProjects(projects);
+            } else if (hasManagerRole) {
+                const projects = await getProjectsByOwnerId(userId);
                 setProjects(projects);
             } else {
                 const projects = await getProjectsByMemberId(userId);
+
                 setProjects(projects);
             }
         };
 
         fetchProjects();
-    }, [hasManageProjectsPermission, userId]);
+    }, [hasAdminRole, hasManagerRole, userId]);
 
     return (
         <div className="projects-container">

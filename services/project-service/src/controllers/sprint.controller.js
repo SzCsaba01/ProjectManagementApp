@@ -16,7 +16,35 @@ class SprintController {
                     sprintData,
                 );
 
-            res.status(200).json({ sprintId: sprintId });
+            res.status(200).json({
+                sprintId: sprintId,
+                message: 'Successfully created a sprint!',
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getSprintById(req, res, next) {
+        try {
+            const sprintId = req.query.sprintId;
+
+            const sprint =
+                await this.sprintService.getSprintByIdAsync(sprintId);
+            res.status(200).json(sprint);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getSprintsByIds(req, res, next) {
+        try {
+            const sprintIds = req.body.sprintIds;
+
+            const sprints =
+                await this.sprintService.getSprintsByIdsAsync(sprintIds);
+
+            res.status(200).json(sprints);
         } catch (error) {
             next(error);
         }
@@ -28,7 +56,9 @@ class SprintController {
 
             await this.sprintService.updateSprintAsync(newSprintData);
 
-            res.status(200).json({});
+            res.status(200).json({
+                message: 'Successfully updated the sprint!',
+            });
         } catch (error) {
             next(error);
         }
@@ -36,11 +66,24 @@ class SprintController {
 
     async finishSprint(req, res, next) {
         try {
+            const sprintData = req.body;
+
+            await this.sprintService.finishSprintAsync(sprintData);
+            res.status(200).json({});
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteSprint(req, res, next) {
+        try {
             const sprintId = req.body.sprintId;
             const projectId = req.body.projectId;
 
-            await this.sprintService.finishSprintAsync(sprintId, projectId);
-            res.status(200).json({});
+            await this.sprintService.deleteSprintAsync(sprintId, projectId);
+            res.status(200).json({
+                message: 'Successfully deleted the sprint!',
+            });
         } catch (error) {
             next(error);
         }

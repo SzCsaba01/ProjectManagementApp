@@ -1,3 +1,8 @@
+import {
+    sendUpdateToBacklogAsync,
+    sendUpdateToSprintAsync,
+} from '../../websocket.js';
+
 class TaskController {
     constructor({ taskService }) {
         this.taskService = taskService;
@@ -43,6 +48,18 @@ class TaskController {
         }
     }
 
+    async getTasksBySprintId(req, res, next) {
+        try {
+            const sprintId = req.query.sprintId;
+
+            const tasks =
+                await this.taskService.getTasksBySprintIdAsync(sprintId);
+            res.status(200).json(tasks);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getTasksByBacklogId(req, res, next) {
         try {
             const backlogId = req.query.backlogId;
@@ -57,7 +74,7 @@ class TaskController {
 
     async updateTask(req, res, next) {
         try {
-            const newTaskData = req.body;
+            const { type, ...newTaskData } = req.body;
 
             let host = undefined;
 
@@ -70,7 +87,29 @@ class TaskController {
                 host,
                 req.files,
             );
-            res.status(200).json(updatedTask);
+
+            const message = {
+                type: 'UPDATE_TASK',
+                task: updatedTask,
+            };
+
+            switch (type) {
+                case 'SPRINT': {
+                    sendUpdateToSprintAsync(updatedTask.sprintId, message);
+                    break;
+                }
+                case 'BACKLOG': {
+                    await sendUpdateToBacklogAsync(
+                        updatedTask.backlogId,
+                        message,
+                    );
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            res.status(200).json();
         } catch (error) {
             next(error);
         }
@@ -80,8 +119,33 @@ class TaskController {
         try {
             const tasksToUpdate = req.body.tasks;
             const sprintId = req.body.sprintId;
+            const backlogId = req.body.backlogId;
+            const type = req.body.type;
+            const draggedTaskId = req.body.draggedTaskId;
 
-            await this.taskService.updateTasksAsync(tasksToUpdate, sprintId);
+            const result = await this.taskService.updateTasksAsync(
+                tasksToUpdate,
+                sprintId,
+            );
+
+            const message = {
+                type: 'UPDATE_TASKS',
+                tasks: result,
+                draggedTaskId: draggedTaskId,
+            };
+
+            switch (type) {
+                case 'SPRINT': {
+                    await sendUpdateToSprintAsync(sprintId, message);
+                    break;
+                }
+                case 'BACKLOG': {
+                    await sendUpdateToBacklogAsync(backlogId, message);
+                    break;
+                }
+                default:
+                    break;
+            }
             res.status(200).json();
         } catch (error) {
             next(error);
@@ -91,7 +155,7 @@ class TaskController {
     async deleteTask(req, res, next) {
         try {
             const taskId = req.body.taskId;
-            await this.taskService.deleteTaskByTaskIdAsync(taskId);
+            await this.taskService.deleteTaskByIdAsync(taskId);
             res.status(200).json({
                 message: 'Successfully deleted the task!',
             });

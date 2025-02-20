@@ -19,7 +19,7 @@ const authorizationMiddleware = (req, res, next) => {
 
     const hasPermission =
         !permissions.length ||
-        permissions.every((permission) =>
+        permissions.some((permission) =>
             userPermissions.some(
                 (userPerm) =>
                     userPerm.resource === permission.resource &&
@@ -28,14 +28,11 @@ const authorizationMiddleware = (req, res, next) => {
         );
 
     if (!hasRole || !hasPermission) {
-        console.log('test');
         return res.status(403).json({
             code: 403,
             status: 'Error',
         });
     }
-
-    console.log(req.path);
 
     return next();
 };

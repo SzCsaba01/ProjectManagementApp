@@ -29,10 +29,10 @@ export const setCurrentProjectDetailsAction = (
     },
 });
 
-export const setCurrentSprintAction = (sprintId) => ({
+export const setCurrentSprintAction = (currentSprintId) => ({
     type: SET_CURRENT_SPRINT,
     payload: {
-        sprintId,
+        currentSprintId,
     },
 });
 

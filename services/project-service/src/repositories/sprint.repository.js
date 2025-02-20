@@ -5,11 +5,11 @@ class SprintRepository {
         return await Sprint.create(sprint);
     }
 
-    async getSprintBySprintIdAsync(sprintId) {
+    async getSprintByIdAsync(sprintId) {
         return await Sprint.findOne({ _id: sprintId });
     }
 
-    async getSptrintsBySprintIdsAsync(sprintIds) {
+    async getSprintsByIdsAsync(sprintIds) {
         return await Sprint.find({ _id: { $in: sprintIds } });
     }
 
@@ -25,8 +25,12 @@ class SprintRepository {
         });
     }
 
-    async deleteSprintBySprintIdAsync(sprintId) {
+    async deleteSprintByIdAsync(sprintId) {
         return await Sprint.deleteOne({ _id: sprintId });
+    }
+
+    async deleteSprintsByIdsAsync(sprintIds) {
+        return await Sprint.deleteMany({ _id: { $in: sprintIds } });
     }
 }
 

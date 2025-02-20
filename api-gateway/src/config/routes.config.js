@@ -27,6 +27,7 @@ const routes = () => {
         {
             route: '/api/task',
             url: process.env.TASK_ROUTE_URL,
+            enableWebSocket: true,
         },
     ];
 };

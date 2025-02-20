@@ -37,19 +37,11 @@ const protectedRoutes = {
             { resource: RESOURCES.PROJECT, action: ACTIONS.MANAGE },
         ],
     },
-    '/get-projects-by-member-id': {
-        permissions: [
-            { resource: RESOURCES.PROJECT, action: ACTIONS.VIEW },
-            { resource: RESOURCES.PROJECT, action: ACTIONS.MANAGE },
-        ],
-        roles: [ADMIN_ROLE, USER_ROLE],
-    },
     '/get-projects-by-owner-id': {
         permissions: [
             { resource: RESOURCES.PROJECT, action: ACTIONS.VIEW },
             { resource: RESOURCES.PROJECT, action: ACTIONS.MANAGE },
         ],
-        roles: [ADMIN_ROLE, MANAGER_ROLE],
     },
 
     //UPDATE

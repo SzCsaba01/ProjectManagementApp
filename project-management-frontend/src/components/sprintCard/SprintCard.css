@@ -1,0 +1,18 @@
+.sprint-history-item {
+    height: 13rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 0.1rem solid var(--light-gray-color);
+    transition:
+        0.3s ease-in-out background-color,
+        0.3s ease-in-out border-color;
+    cursor: pointer;
+}
+
+.sprint-history-item:hover {
+    background-color: var(--light-gray-color);
+    border-color: var(--primary-color);
+}

@@ -17,6 +17,9 @@ const taskRoutes = (container) => {
     router.get('/get-current-sprint-tasks-by-sprint-id', (req, res, next) =>
         taskController.getCurrentSprintTasksBySprintId(req, res, next),
     );
+    router.get('/get-sprint-tasks-by-sprint-id', (req, res, next) =>
+        taskController.getTasksBySprintId(req, res, next),
+    );
     router.get('/get-tasks-by-backlog-id', (req, res, next) =>
         taskController.getTasksByBacklogId(req, res, next),
     );

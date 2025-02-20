@@ -44,6 +44,10 @@ const userRoutes = (container) => {
         userController.setSelectedProject(req, res, next),
     );
 
+    //DELETE
+    router.delete('/delete-user', (req, res, next) =>
+        userController.deleteUser(req, res, next),
+    );
     return router;
 };
 

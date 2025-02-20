@@ -1,24 +1,24 @@
 import { Kafka } from 'kafkajs';
 import { NotFoundError } from '../errors/index.js';
 
-let kafkaConsumer = null;
+let kafkaProjectConsumer = null;
 
-const getKafkaConsumer = () => {
-    if (!kafkaConsumer) {
+const getKafkaProjectConsumer = () => {
+    if (!kafkaProjectConsumer) {
         const kafka = new Kafka({
             clientId: process.env.KAFKA_CLIENT_ID,
             brokers: [process.env.KAFKA_BROKER_URL],
         });
-        kafkaConsumer = kafka.consumer({
-            groupId: process.env.KAFKA_CONSUMER_GROUP_ID,
+        kafkaProjectConsumer = kafka.consumer({
+            groupId: process.env.KAFKA_PROJECT_CONSUMER_GROUP_ID,
         });
     }
-    return kafkaConsumer;
+    return kafkaProjectConsumer;
 };
 
-const connectKafkaAsync = async () => {
+const connectKafkaProjectConsumerAsync = async () => {
     try {
-        const consumer = getKafkaConsumer();
+        const consumer = getKafkaProjectConsumer();
         await consumer.connect();
         console.log('Kafka connected successfully!');
     } catch (error) {
@@ -26,9 +26,9 @@ const connectKafkaAsync = async () => {
     }
 };
 
-const disconnectKafkaAsync = async () => {
+const disconnectKafkaProjectConsumerAsync = async () => {
     try {
-        const consumer = getKafkaConsumer();
+        const consumer = getKafkaProjectConsumer();
         await consumer.disconnect();
         console.log('Kafka consumer disconnected.');
     } catch (error) {
@@ -37,7 +37,7 @@ const disconnectKafkaAsync = async () => {
 };
 
 const subscribeToAddUsersToProjectEvent = async () => {
-    const consumer = getKafkaConsumer();
+    const consumer = getKafkaProjectConsumer();
     await consumer.subscribe({
         topic: process.env.KAFKA_ADD_USERS_TO_PROJECT_TOPIC,
         fromBeginning: false,
@@ -45,15 +45,15 @@ const subscribeToAddUsersToProjectEvent = async () => {
 };
 
 const subscribeToRemoveUsersFromProjectEvent = async () => {
-    const consumer = getKafkaConsumer();
+    const consumer = getKafkaProjectConsumer();
     await consumer.subscribe({
         topic: process.env.KAFKA_REMOVE_USERS_FROM_PROJECT_TOPIC,
         fromBeginning: false,
     });
 };
 
-const runKafkaConsumer = async (userService) => {
-    const consumer = getKafkaConsumer();
+const runKafkaProjectConsumer = async (userService) => {
+    const consumer = getKafkaProjectConsumer();
     await consumer.run({
         eachMessage: async ({ topic, _partition, message }) => {
             console.log(
@@ -80,9 +80,9 @@ const runKafkaConsumer = async (userService) => {
 };
 
 export {
-    connectKafkaAsync,
-    disconnectKafkaAsync,
+    connectKafkaProjectConsumerAsync,
+    disconnectKafkaProjectConsumerAsync,
     subscribeToAddUsersToProjectEvent,
     subscribeToRemoveUsersFromProjectEvent,
-    runKafkaConsumer,
+    runKafkaProjectConsumer,
 };

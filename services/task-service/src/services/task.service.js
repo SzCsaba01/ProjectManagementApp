@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { BacklogStatus, TaskStatus } from '../utils/index.js';
+import { TaskStatus } from '../utils/index.js';
 
 class TaskService {
     constructor({ taskRepository }) {
@@ -9,13 +9,18 @@ class TaskService {
     }
 
     async createTaskAsync(newTaskData, host, files) {
+        if (
+            newTaskData.storyPoints === 'null' ||
+            newTaskData.storyPoints === ''
+        ) {
+            newTaskData.storyPoints = null;
+        }
         const newTask = await this.taskRepository.createTaskAsync(newTaskData);
-
         if (!files) {
             return newTask;
         }
 
-        newTask.attachments = await this.saveAttachmentsAsync(
+        newTask.attachments = this.#saveAttachmentsAsync(
             files,
             newTask.id,
             host,
@@ -33,6 +38,13 @@ class TaskService {
         return tasks;
     }
 
+    async getTasksBySprintIdAsync(sprintId) {
+        const tasks =
+            await this.taskRepository.getTasksBySprintIdAsync(sprintId);
+
+        return tasks;
+    }
+
     async getTasksByBacklogIdAsync(backlogId) {
         const tasks =
             await this.taskRepository.getTasksByBacklogIdAsync(backlogId);
@@ -41,20 +53,22 @@ class TaskService {
     }
 
     async updateTaskAsync(newTaskData, host, files) {
-        this.removeOldAttachments(
+        if (
+            newTaskData.storyPoints === 'null' ||
+            newTaskData.storyPoints === ''
+        ) {
+            newTaskData.storyPoints = null;
+        }
+        this.#removeOldAttachments(
             newTaskData.attachments || [],
             newTaskData._id,
         );
-        if (files) {
+        if (files.length) {
             if (!newTaskData.attachments) {
                 newTaskData.attachments = [];
             }
             newTaskData.attachments.push(
-                ...(await this.saveAttachmentsAsync(
-                    files,
-                    newTaskData._id,
-                    host,
-                )),
+                ...this.#saveAttachmentsAsync(files, newTaskData._id, host),
             );
         }
         newTaskData.updatedAt = Date.now();
@@ -67,43 +81,76 @@ class TaskService {
     async updateTasksAsync(newTasksData, sprintId = undefined) {
         if (sprintId) {
             newTasksData.forEach((task) => {
-                this.#checkBacklogStatus(task);
                 this.#checkTaskStatusByStatus(task);
             });
         }
         await this.taskRepository.updateTasksAsync(newTasksData);
+        return newTasksData;
     }
 
     async startSprintAsync(sprintData) {
         const sprintId = sprintData.sprintId;
         const backlogId = sprintData.backlogId;
 
-        const currentSprintTasks =
-            await this.taskRepository.getCurrentSprintTasksByBacklogIdAsync(
-                backlogId,
-            );
+        const backlogTasks =
+            await this.taskRepository.getTasksByBacklogIdAsync(backlogId);
 
-        currentSprintTasks.forEach((task) => {
+        backlogTasks.forEach((task) => {
             task.sprintId = sprintId;
         });
 
-        await this.taskRepository.updateTasksAsync(currentSprintTasks);
+        await this.taskRepository.updateTasksAsync(backlogTasks);
+    }
+
+    async removeUserFromTasksAsync(userId) {
+        const userAssignedTasks =
+            await this.taskRepository.getTasksByAssigneeIdAsync(userId);
+        const userCreatedTasks =
+            await this.taskRepository.getTasksByCreatorIdAsync(userId);
+
+        userAssignedTasks.forEach((task) => {
+            task.assigneeId = null;
+        });
+        userCreatedTasks.forEach((task) => {
+            task.creatorId = null;
+        });
+
+        const allTasks = [...userAssignedTasks, ...userCreatedTasks];
+
+        if (!allTasks.length) {
+            return;
+        }
+
+        await this.taskRepository.updateTasksAsync(allTasks);
     }
 
     async finishSprintAsync(sprintData) {
-        const finishedTasks =
-            await this.taskRepository.getFinishedTasksBySprintId(
+        const sprintTasks =
+            await this.taskRepository.getCurrentSprintTasksBySprintIdAsync(
                 sprintData.sprintId,
             );
 
-        finishedTasks.forEach((task) => {
-            task.backlogId = null;
+        sprintTasks.forEach((task) => {
+            task.sprintEnded = true;
         });
 
-        await this.taskRepository.updateTasksAsync(finishedTasks);
+        await this.taskRepository.updateTasksAsync(sprintTasks);
     }
 
-    async saveAttachmentsAsync(files, taskId, host) {
+    async deleteTaskByIdAsync(taskId) {
+        this.#removeAllAttachmentsByTaskId(taskId);
+        await this.taskRepository.deleteTaskByIdAsync(taskId);
+    }
+
+    async deleteTasksByBacklogIdAsync(backlogId) {
+        await this.taskRepository.deleteTasksByBacklogIdAsync(backlogId);
+    }
+
+    async deleteTasksBySprintIdAsync(sprintId) {
+        await this.taskRepository.deleteTasksBySprintIdAsync(sprintId);
+    }
+
+    #saveAttachmentsAsync(files, taskId, host) {
         const uploadRoot = path.join(process.cwd(), 'resources', 'attachments');
         const taskFolder = path.join(uploadRoot, taskId);
 
@@ -126,7 +173,7 @@ class TaskService {
         return attachments;
     }
 
-    async removeOldAttachments(attachments, taskId) {
+    #removeOldAttachments(attachments, taskId) {
         const uploadRoot = path.join(process.cwd(), 'resources', 'attachments');
         const taskFolder = path.join(uploadRoot, taskId);
 
@@ -146,16 +193,11 @@ class TaskService {
         }
     }
 
-    #checkBacklogStatus(task) {
-        if (
-            task.backlogStatus === BacklogStatus.CurrentSprint.description &&
-            !task.sprintId
-        ) {
-            task.sprintId = sprintId;
-        } else if (
-            BacklogStatus.CurrentSprint.description !== task.backlogStatus
-        ) {
-            task.sprintId = null;
+    #removeAllAttachmentsByTaskId(taskId) {
+        const deleteRoot = path.join(process.cwd(), 'resources', 'attachments');
+        const taskFolder = path.join(deleteRoot, taskId);
+        if (fs.existsSync(taskFolder)) {
+            fs.rmdirSync(taskFolder, { recursive: true });
         }
     }
 
@@ -169,17 +211,29 @@ class TaskService {
             task.completedAt &&
             task.status !== TaskStatus.Completed.description
         ) {
+            task.finishedAt = null;
             task.status = TaskStatus.Completed.description;
         } else if (
             task.startedAt &&
             task.status !== TaskStatus.InProgress.description
         ) {
+            task.finishedAt = null;
+            task.completedAt = null;
             task.status = TaskStatus.InProgress.description;
         } else if (
             task.plannedAt &&
             task.status !== TaskStatus.InPlanning.description
         ) {
+            task.finishedAt = null;
+            task.completedAt = null;
+            task.startedAt = null;
             task.status = TaskStatus.InPlanning.description;
+        } else {
+            task.finishedAt = null;
+            task.completedAt = null;
+            task.startedAt = null;
+            task.plannedAt = null;
+            task.status = TaskStatus.NotStarted.description;
         }
     }
 
@@ -189,27 +243,29 @@ class TaskService {
             task.status === TaskStatus.Finished.description
         ) {
             task.finishedAt = Date.now();
-        } else if (
-            !task.completedAt &&
-            task.status === TaskStatus.Completed.description
-        ) {
-            task.completedAt = Date.now();
+        } else if (task.status === TaskStatus.Completed.description) {
             task.finishedAt = null;
-        } else if (
-            !task.startedAt &&
-            task.status === TaskStatus.InProgress.description
-        ) {
+            if (!task.completedAt) {
+                task.completedAt = Date.now();
+            }
+        } else if (task.status === TaskStatus.InProgress.description) {
             task.finishedAt = null;
             task.completedAt = null;
-            task.startedAt = Date.now();
-        } else if (
-            !task.plannedAt &&
-            task.status === TaskStatus.InPlanning.description
-        ) {
+            if (!task.startedAt) {
+                task.startedAt = Date.now();
+            }
+        } else if (task.status === TaskStatus.InPlanning.description) {
             task.finishedAt = null;
             task.completedAt = null;
             task.startedAt = null;
-            task.plannedAt = Date.now();
+            if (!task.plannedAt) {
+                task.plannedAt = Date.now();
+            }
+        } else {
+            task.finishedAt = null;
+            task.completedAt = null;
+            task.startedAt = null;
+            task.plannedAt = null;
         }
     }
 }

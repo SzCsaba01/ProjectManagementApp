@@ -13,7 +13,22 @@
     width: 100%;
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-details-container .task-details-header.flex-end {
     justify-content: flex-end;
+}
+
+.task-details-header .delete-icon {
+    color: var(--danger-color);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.task-details-header .delete-icon:hover {
+    color: var(--danger-hover);
 }
 
 .task-details-container form {

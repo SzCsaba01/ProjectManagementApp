@@ -161,6 +161,10 @@ class UserRepository {
             .populate('roles');
     }
 
+    async getUsersBySelectedProjectIdAsync(projectId) {
+        return await User.find({ selectedProjectId: projectId });
+    }
+
     async updateUserAsync(user) {
         const { _id, ...userWithoutId } = user;
         await User.updateOne({ _id: user._id }, { $set: userWithoutId });
@@ -177,7 +181,7 @@ class UserRepository {
         return await User.bulkWrite(bulkOps);
     }
 
-    async deleteUserByUserIdAsync(userId) {
+    async deleteUserByIdAsync(userId) {
         await User.deleteOne({ _id: userId });
     }
 }

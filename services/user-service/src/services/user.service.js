@@ -7,6 +7,7 @@ import {
     MANAGER_ROLE,
     ADMIN_ROLE,
 } from '../utils/index.js';
+import { publishUserEventToTopicAsync } from '../kafka/index.js';
 
 class UserService {
     constructor({
@@ -185,6 +186,7 @@ class UserService {
 
         result.users = result.users.map((user) => {
             return {
+                userId: user._id,
                 username: user.username,
                 email: user.email,
                 firstName: user.userProfile.firstName,
@@ -343,9 +345,17 @@ class UserService {
     }
 
     async removeUsersFromProjectAsync(usersData) {
-        const users = await this.userRepository.getUsersByIdsAsync(
+        let users = await this.userRepository.getUsersByIdsAsync(
             usersData.userIds,
         );
+        const selectedProjectUsers =
+            await this.userRepository.getUsersBySelectedProjectIdAsync(
+                usersData.projectId,
+            );
+
+        if (selectedProjectUsers && selectedProjectUsers.length > 0) {
+            users = [...users, ...selectedProjectUsers];
+        }
 
         if (!users) {
             throw NotFoundError('No user were found!');
@@ -355,6 +365,9 @@ class UserService {
             user.projects = user.projects.filter(
                 (projectId) => projectId !== usersData.projectId,
             );
+            if (user.selectedProjectId === usersData.projectId) {
+                user.selectedProjectId = null;
+            }
         });
 
         await this.userRepository.updateUsersAsync(users);
@@ -377,6 +390,20 @@ class UserService {
         user.selectedProjectId = data.projectId;
 
         await this.userRepository.updateUserAsync(user);
+    }
+
+    async deleteUserAsync(userId) {
+        const messageData = {
+            userId: userId,
+        };
+
+        await publishUserEventToTopicAsync(
+            process.env.KAFKA_DELETE_USER_TOPIC,
+            messageData,
+        );
+
+        await this.userRepository.deleteUserByIdAsync(userId);
+        await this.userProfileRepository.deleteUserProfileByUserIdAsync(userId);
     }
 
     async deleteExpiredBlacklistedTokensAsync() {

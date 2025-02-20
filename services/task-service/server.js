@@ -1,24 +1,31 @@
 import { app, container } from './app.js';
 import { connectDB } from './src/config/index.js';
 import {
-    connectKafkaProducerAsync,
-    connectKafkaConsumerAsync,
-    startKafkaSubscriptionsAsync,
-    disconnectKafkaProducerAsync,
-    disconnectKafkaConsumerAsync,
+    connectKafkaProjectConsumerAsync,
+    connectKafkaUserConsumerAsync,
+    startKafkaProjectSubscriptionsAsync,
+    startKafkaUserSubscriptionsAsync,
+    disconnectKafkaUserConsumerAsync,
+    disconnectKafkaProjectConsumerAsync,
 } from './src/kafka/index.js';
+import http from 'http';
+import { initializeWebSocketServer } from './websocket.js';
 
 const port = process.env.PORT || 3000;
 
 const startServer = async () => {
     try {
         await connectDB();
-        await connectKafkaConsumerAsync();
-        await connectKafkaProducerAsync();
+        await connectKafkaProjectConsumerAsync();
+        await connectKafkaUserConsumerAsync();
 
-        await startKafkaSubscriptionsAsync(container);
+        await startKafkaProjectSubscriptionsAsync(container);
+        await startKafkaUserSubscriptionsAsync(container);
+        const server = http.createServer(app);
 
-        app.listen(port, () => {
+        initializeWebSocketServer(server);
+
+        server.listen(port, () => {
             console.log(`Server is running on http://localhost:${port}`);
         });
     } catch (error) {
@@ -32,8 +39,8 @@ startServer();
 process.on('SIGINT', async () => {
     console.log('Received SIGINT. Shutting down...');
     try {
-        await disconnectKafkaConsumerAsync();
-        await disconnectKafkaProducerAsync();
+        await disconnectKafkaProjectConsumerAsync();
+        await disconnectKafkaUserConsumerAsync();
 
         console.log('Express server closed.');
         process.exit(0);
@@ -46,8 +53,8 @@ process.on('SIGINT', async () => {
 process.on('SIGTERM', async () => {
     console.log('Received SIGTERM. Shutting down...');
     try {
-        await disconnectKafkaProducerAsync();
-        await disconnectKafkaConsumerAsync();
+        await disconnectKafkaProjectConsumerAsync();
+        await disconnectKafkaUserConsumerAsync();
 
         console.log('Express server closed.');
         process.exit(0);
