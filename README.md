@@ -18,7 +18,7 @@ A project management application designed to handle user information, project ma
 - **Backend**: Node.js, Express.js, Awilix, MongoDB, Mongoose, Kafka, JWT
 - **Frontend**: React, Redux, Axios, Yup
 - **Authentication**: JWT, HTTP-only cookies
-- **Real-time Communication**: WebSockets (future implementation)
+- **Real-time Communication**: WebSockets
 - **Caching**: Redis (future implementation)
 - **DevOps**: Docker, Kubernetes (future implementation)
 - **API Gateway**: Proxy for microservices with rate-limiting and security
@@ -30,7 +30,8 @@ A project management application designed to handle user information, project ma
   - **Admin**: Can manage all users, projects, sprints, and tasks.
   - **Manager**: Can manage projects and tasks within the project.
   - **User**: Can manage tasks and sprints within the assigned projects.
-- **Real-Time Updates**: Updates on tasks, sprints, and backlog boards will be reflected live (WebSockets).
+- **Real-Time Updates**: Updates on tasks, sprints, and backlog boards are reflected live via WebSockets.
+- **Sprint History Page**: Allows users to view past sprints and their details.
 - **Custom Components**: Reusable UI components like Icons, Inputs, Buttons, and Select dropdowns.
 - **Error Handling**: Global error handling with middleware.
 - **Notifications**: Success and error messages are displayed through a notification bar.
@@ -75,7 +76,6 @@ The backend microservices follow a **layered architecture** with routes, service
 
 ## Future Enhancements
 
-- **WebSockets**: To implement real-time task updates and notifications for the backlog and sprint board.
 - **Redis Cache**: For improving performance by caching frequently accessed data.
 - **CI/CD Pipeline**: Using **Docker** and **Kubernetes** to automate deployments and scale the application.
 
@@ -89,3 +89,5 @@ The backend microservices follow a **layered architecture** with routes, service
 ![CurrentSprint](screenshots/CreateSprint.png)
 ![EditProject](screenshots/EditProject.png)
 ![Users](screenshots/Users.png)
+![SprintHistory](screenshots/SprintHistory.png)
+![SprintDetails](screenshots/SprintDetails.png)
