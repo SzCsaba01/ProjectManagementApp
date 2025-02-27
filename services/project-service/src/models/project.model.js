@@ -19,6 +19,7 @@ const projectSchema = new mongoose.Schema({
     currentSprint: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Sprint',
+        default: null,
     },
     finishedSprints: [
         {

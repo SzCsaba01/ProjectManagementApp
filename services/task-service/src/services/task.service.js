@@ -4,8 +4,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { TaskStatus } from '../utils/index.js';
 
 class TaskService {
-    constructor({ taskRepository }) {
+    constructor({ taskRepository, taskRedisRepository }) {
         this.taskRepository = taskRepository;
+        this.taskRedisRepository = taskRedisRepository;
     }
 
     async createTaskAsync(newTaskData, host, files) {
@@ -26,14 +27,28 @@ class TaskService {
             host,
         );
 
-        return await this.taskRepository.updateTaskAsync(newTask);
+        const updatedTask = await this.taskRepository.updateTaskAsync(newTask);
+        await this.taskRedisRepository.cacheTaskAsync(updatedTask);
+
+        return updatedTask;
     }
 
     async getCurrentSprintTasksBySprintIdAsync(sprintId) {
+        const redisTasks =
+            await this.taskRedisRepository.getCurrentSprintTasksBySprintIdAsync(
+                sprintId,
+            );
+
+        if (redisTasks.length) {
+            return redisTasks;
+        }
+
         const tasks =
             await this.taskRepository.getCurrentSprintTasksBySprintIdAsync(
                 sprintId,
             );
+
+        await this.taskRedisRepository.cacheTasksAsync(tasks);
 
         return tasks;
     }
@@ -46,8 +61,17 @@ class TaskService {
     }
 
     async getTasksByBacklogIdAsync(backlogId) {
+        const redisTasks =
+            await this.taskRedisRepository.getTasksByBacklogIdAsync(backlogId);
+
+        if (redisTasks.length) {
+            return redisTasks;
+        }
+
         const tasks =
             await this.taskRepository.getTasksByBacklogIdAsync(backlogId);
+
+        await this.taskRedisRepository.cacheTasksAsync(tasks);
 
         return tasks;
     }
@@ -75,7 +99,11 @@ class TaskService {
 
         this.#checkTaskStatusByDate(newTaskData);
 
-        return await this.taskRepository.updateTaskAsync(newTaskData);
+        const updatedTask =
+            await this.taskRepository.updateTaskAsync(newTaskData);
+        await this.taskRedisRepository.updateTaskAsync(updatedTask);
+
+        return updatedTask;
     }
 
     async updateTasksAsync(newTasksData, sprintId = undefined) {
@@ -85,6 +113,7 @@ class TaskService {
             });
         }
         await this.taskRepository.updateTasksAsync(newTasksData);
+        await this.taskRedisRepository.updateTasksAsync(newTasksData);
         return newTasksData;
     }
 
@@ -100,6 +129,7 @@ class TaskService {
         });
 
         await this.taskRepository.updateTasksAsync(backlogTasks);
+        await this.taskRedisRepository.updateTasksAsync(backlogTasks);
     }
 
     async removeUserFromTasksAsync(userId) {
@@ -122,6 +152,7 @@ class TaskService {
         }
 
         await this.taskRepository.updateTasksAsync(allTasks);
+        await this.taskRedisRepository.updateTasksAsync(allTasks);
     }
 
     async finishSprintAsync(sprintData) {
@@ -135,19 +166,26 @@ class TaskService {
         });
 
         await this.taskRepository.updateTasksAsync(sprintTasks);
+        await this.taskRedisRepository.deleteTasksAsync(sprintTasks);
     }
 
     async deleteTaskByIdAsync(taskId) {
         this.#removeAllAttachmentsByTaskId(taskId);
-        await this.taskRepository.deleteTaskByIdAsync(taskId);
+        const deletedTask =
+            await this.taskRepository.deleteTaskByIdAsync(taskId);
+        await this.taskRedisRepository.deleteTaskAsync(deletedTask);
     }
 
     async deleteTasksByBacklogIdAsync(backlogId) {
-        await this.taskRepository.deleteTasksByBacklogIdAsync(backlogId);
+        const deletedTasks =
+            await this.taskRepository.deleteTasksByBacklogIdAsync(backlogId);
+        await this.taskRedisRepository.deleteTasksAsync(deletedTasks);
     }
 
     async deleteTasksBySprintIdAsync(sprintId) {
-        await this.taskRepository.deleteTasksBySprintIdAsync(sprintId);
+        const deletedTasks =
+            await this.taskRepository.deleteTasksBySprintIdAsync(sprintId);
+        await this.taskRedisRepository.deleteTasksAsync(deletedTasks);
     }
 
     #saveAttachmentsAsync(files, taskId, host) {

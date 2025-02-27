@@ -1,5 +1,9 @@
 import { app, container } from './app.js';
-import { connectDB } from './src/config/index.js';
+import {
+    connectDB,
+    disconnectRedisClient,
+    initializeRedis,
+} from './src/config/index.js';
 import {
     connectKafkaProjectConsumerAsync,
     connectKafkaUserConsumerAsync,
@@ -16,6 +20,8 @@ const port = process.env.PORT || 3000;
 const startServer = async () => {
     try {
         await connectDB();
+        await initializeRedis();
+
         await connectKafkaProjectConsumerAsync();
         await connectKafkaUserConsumerAsync();
 
@@ -39,6 +45,7 @@ startServer();
 process.on('SIGINT', async () => {
     console.log('Received SIGINT. Shutting down...');
     try {
+        await disconnectRedisClient();
         await disconnectKafkaProjectConsumerAsync();
         await disconnectKafkaUserConsumerAsync();
 
@@ -53,6 +60,7 @@ process.on('SIGINT', async () => {
 process.on('SIGTERM', async () => {
     console.log('Received SIGTERM. Shutting down...');
     try {
+        await disconnectRedisClient();
         await disconnectKafkaProjectConsumerAsync();
         await disconnectKafkaUserConsumerAsync();
 

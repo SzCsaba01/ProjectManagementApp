@@ -2,7 +2,9 @@ import { createContainer, asClass } from 'awilix';
 import {
     BacklogRepository,
     ProjectRepository,
+    ProjectRedisRepository,
     SprintRepository,
+    SprintRedisRepository,
 } from '../repositories/index.js';
 import {
     BacklogService,
@@ -21,7 +23,9 @@ container.register({
     //Repositories
     backlogRepository: asClass(BacklogRepository).scoped(),
     sprintRepository: asClass(SprintRepository).scoped(),
+    sprintRedisRepository: asClass(SprintRedisRepository).scoped(),
     projectRepository: asClass(ProjectRepository).scoped(),
+    projectRedisRepository: asClass(ProjectRedisRepository).scoped(),
 
     //Services
     backlogService: asClass(BacklogService).scoped(),

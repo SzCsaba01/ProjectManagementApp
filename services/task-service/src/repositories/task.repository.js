@@ -67,11 +67,19 @@ class TaskRepository {
     }
 
     async deleteTasksByBacklogIdAsync(backlogId) {
-        return await Task.deleteMany({ backlogId: backlogId });
+        const deletedTasks = await Task.find({ backlogId: backlogId });
+
+        await Task.deleteMany({ backlogId: backlogId });
+
+        return deletedTasks;
     }
 
     async deleteTasksBySprintIdAsync(sprintId) {
-        return await Task.deleteMany({ sprintId: sprintId });
+        const deletedTasks = await Task.find({ sprintId: sprintId });
+
+        await Task.deleteMany({ sprintId: sprintId });
+
+        return deletedTasks;
     }
 }
 

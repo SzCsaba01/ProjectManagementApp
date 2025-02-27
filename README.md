@@ -19,7 +19,7 @@ A project management application designed to handle user information, project ma
 - **Frontend**: React, Redux, Axios, Yup
 - **Authentication**: JWT, HTTP-only cookies
 - **Real-time Communication**: WebSockets
-- **Caching**: Redis (future implementation)
+- **Caching**: Redis
 - **DevOps**: Docker, Kubernetes (future implementation)
 - **API Gateway**: Proxy for microservices with rate-limiting and security
 - **Testing**: TBD
@@ -35,6 +35,7 @@ A project management application designed to handle user information, project ma
 - **Custom Components**: Reusable UI components like Icons, Inputs, Buttons, and Select dropdowns.
 - **Error Handling**: Global error handling with middleware.
 - **Notifications**: Success and error messages are displayed through a notification bar.
+- **Caching with Redis**: Frequently accessed data is cached to improve performance and reduce database load.
 
 ## Microservices
 
@@ -55,6 +56,7 @@ The backend microservices use a **layered architecture** with the following laye
 - **Services**: Business logic for handling the core functionality.
 - **Repositories**: Interface with the database to fetch or modify data.
 - **Models**: Define the data structure and schema for MongoDB.
+- **Caching Layer**: Implements Redis caching for frequently accessed data to enhance performance.
 
 This structure helps organize the application and makes it more maintainable.
 
@@ -70,13 +72,12 @@ The frontend is built with **React** and uses **Redux** for state management. Th
 
 ## Backend
 
-The backend is built with **Express.js**, and the business logic is modularized using **Awilix** for dependency injection. The microservices architecture is used for better scalability and maintenance. Kafka handles asynchronous communication between services, and **MongoDB** is used to store all data.
+The backend is built with **Express.js**, and the business logic is modularized using **Awilix** for dependency injection. The microservices architecture is used for better scalability and maintenance. Kafka handles asynchronous communication between services, and **MongoDB** is used to store all data. **Redis** is integrated to cache frequently accessed data, improving performance and reducing database load.
 
 The backend microservices follow a **layered architecture** with routes, services, controllers, repositories, and models for better maintainability and scalability.
 
 ## Future Enhancements
 
-- **Redis Cache**: For improving performance by caching frequently accessed data.
 - **CI/CD Pipeline**: Using **Docker** and **Kubernetes** to automate deployments and scale the application.
 
 ## Screenshots

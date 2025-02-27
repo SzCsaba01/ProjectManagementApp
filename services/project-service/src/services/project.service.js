@@ -1,9 +1,14 @@
-import NotFoundError from '../errors/notFound.error.js';
 import { publishProjectEventToTopicAsync } from '../kafka/index.js';
 
 class ProjectService {
-    constructor({ projectRepository, backlogRepository, sprintRepository }) {
+    constructor({
+        projectRepository,
+        projectRedisRepository,
+        backlogRepository,
+        sprintRepository,
+    }) {
         this.projectRepository = projectRepository;
+        this.projectRedisRepository = projectRedisRepository;
         this.backlogRepository = backlogRepository;
         this.sprintRepository = sprintRepository;
     }
@@ -36,20 +41,35 @@ class ProjectService {
     }
 
     async getProjectByProjectIdAsync(projectId) {
-        const projectWithDetails =
-            await this.projectRepository.getProjectByProjectIdAsync(projectId);
+        const redisProjectData =
+            await this.projectRedisRepository.getProjectByIdAsync(projectId);
 
-        if (projectWithDetails) {
+        if (redisProjectData) {
             const project = {
-                name: projectWithDetails.name,
-                backlogId: projectWithDetails.backlog,
-                currentSprintId: projectWithDetails.currentSprint,
-                finishedSprintIds: projectWithDetails.finishedSprints,
+                name: redisProjectData.name,
+                backlogId: redisProjectData.backlog,
+                currentSprintId: redisProjectData.currentSprint,
+                finishedSprintIds: redisProjectData.finishedSprints,
             };
 
             return project;
         }
-        throw new NotFoundError('Project not found!');
+
+        const projectData =
+            await this.projectRepository.getProjectByProjectIdAsync(projectId);
+
+        await this.projectRedisRepository.cacheProjectAsync(projectData);
+
+        if (projectData) {
+            const project = {
+                name: projectData.name,
+                backlogId: projectData.backlog,
+                currentSprintId: projectData.currentSprint,
+                finishedSprintIds: projectData.finishedSprints,
+            };
+
+            return project;
+        }
     }
 
     async getProjectsByMemberIdAsync(memberId) {
@@ -60,17 +80,22 @@ class ProjectService {
     }
 
     async getProjectsByOwnerIdAsync(ownerId) {
-        const project =
-            await this.projectRepository.getProjectsByOnwerIdAsync(ownerId);
+        const projects =
+            await this.projectRepository.getProjectsByOwnerIdAsync(ownerId);
 
-        return project;
+        return projects;
     }
 
     async updateProjectAsync(newProjectData) {
-        const oldProject =
-            await this.projectRepository.getProjectByProjectIdAsync(
+        const redisProject =
+            await this.projectRedisRepository.getProjectByIdAsync(
                 newProjectData._id,
             );
+        const oldProject = redisProject
+            ? redisProject
+            : await this.projectRepository.getProjectByProjectIdAsync(
+                  newProjectData._id,
+              );
 
         const userIdsToBeRemoved = oldProject.userIds.filter(
             (userId) => !newProjectData.userIds.includes(userId),
@@ -86,6 +111,7 @@ class ProjectService {
         }
 
         await this.projectRepository.updateProjectAsync(newProjectData);
+        await this.projectRedisRepository.updateProjectAsync(newProjectData);
 
         if (userIdsToBeRemoved.length) {
             const removeUsersFromProjectData = {
@@ -131,16 +157,25 @@ class ProjectService {
             });
 
             await this.projectRepository.updateProjectsAsync(userOwnerProjects);
+            await this.projectRedisRepository.updateProjectsAsync(
+                userOwnerProjects,
+            );
         }
 
         if (userMemberProjects.length > 0) {
             await this.projectRepository.updateProjectsAsync(
                 userMemberProjects,
             );
+            await this.projectRedisRepository.updateProjectsAsync(
+                userMemberProjects,
+            );
         }
     }
 
     async deleteProjectByProjectIdAsync(projectId) {
+        await this.projectRedisRepository.deleteProjectByProjectIdAsync(
+            projectId,
+        );
         const deletedProject =
             await this.projectRepository.deleteProjectByProjectIdAsync(
                 projectId,

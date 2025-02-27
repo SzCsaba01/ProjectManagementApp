@@ -177,14 +177,18 @@ const CreateTaskModal = ({ users, onClose, onTaskCreated }) => {
 
         formData.append('name', data.name);
         formData.append('description', data.description);
-        formData.append('assigneeId', data.assigneeId);
         formData.append('category', data.category);
         formData.append('priority', data.priority);
         formData.append('backlogStatus', data.backlogStatus);
         formData.append('storyPoints', data.storyPoints);
         formData.append('creatorId', userId);
         formData.append('backlogId', backlogId);
-        formData.append('sprintId', currentSprintId);
+        if (currentSprintId) {
+            formData.append('sprintId', currentSprintId);
+        }
+        if (data.assigneeId) {
+            formData.append('assigneeId', data.assigneeId);
+        }
 
         data.attachments.forEach((file) => {
             formData.append(`attachments`, file);

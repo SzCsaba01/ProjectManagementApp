@@ -23,11 +23,8 @@ import TaskDetails from '../../../components/taskDetails/TaskDetails';
 import CreateSprintModal from '../../../components/createSprintModal/CreateSprintModal';
 import { useSelector } from 'react-redux';
 import useWebSocket from '../../../hooks/useWebSocket';
-import { useNavigate } from 'react-router-dom';
 
 const Backlog = () => {
-    const navigate = useNavigate();
-
     const { userId } = useSelector((state) => state.user);
     const { projectId, backlogId, currentSprintId } = useSelector(
         (state) => state.project,

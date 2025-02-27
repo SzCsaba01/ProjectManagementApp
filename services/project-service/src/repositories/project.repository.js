@@ -13,10 +13,6 @@ class ProjectRepository {
         return await Project.findOne({ _id: projectId });
     }
 
-    async getProjectsByOnwerIdAsync(ownerId) {
-        return await Project.find({ ownerId: ownerId });
-    }
-
     async getProjectsByMemberIdAsync(memberId) {
         return await Project.find({ userIds: memberId });
     }
