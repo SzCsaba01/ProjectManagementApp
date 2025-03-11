@@ -1,6 +1,6 @@
 # Project Management App
 
-A project management application designed to handle user information, project management, and task management with microservices architecture. This app implements various modern concepts such as dependency injection, role-based security, and real-time updates with WebSockets. The goal of the project is to learn and implement best practices for building scalable and maintainable web applications.
+A project management application designed to handle user information, project management, and task management with a microservices architecture. This app implements various modern concepts such as dependency injection, role-based security, and real-time updates with WebSockets. The goal of the project is to learn and implement best practices for building scalable and maintainable web applications.
 
 ## Table of Contents
 
@@ -11,6 +11,7 @@ A project management application designed to handle user information, project ma
 - [Authentication & Authorization](#authentication--authorization)
 - [Frontend](#frontend)
 - [Backend](#backend)
+- [Testing](#testing)
 - [Future Enhancements](#future-enhancements)
 
 ## Technologies
@@ -20,9 +21,8 @@ A project management application designed to handle user information, project ma
 - **Authentication**: JWT, HTTP-only cookies
 - **Real-time Communication**: WebSockets
 - **Caching**: Redis
-- **DevOps**: Docker, Kubernetes (future implementation)
 - **API Gateway**: Proxy for microservices with rate-limiting and security
-- **Testing**: TBD
+- **Testing**: Jest, Supertest
 
 ## Features
 
@@ -76,9 +76,16 @@ The backend is built with **Express.js**, and the business logic is modularized 
 
 The backend microservices follow a **layered architecture** with routes, services, controllers, repositories, and models for better maintainability and scalability.
 
+## Testing
+
+The application is thoroughly tested using **Jest**:
+
+- **Unit Tests**: Validate individual functions and business logic.
+- **Mocking**: Services and database calls are mocked where necessary to isolate components.
+
 ## Future Enhancements
 
-- **CI/CD Pipeline**: Using **Docker** and **Kubernetes** to automate deployments and scale the application.
+- **CI/CD Pipeline**: Automate deployments and ensure continuous integration.
 
 ## Screenshots
 
