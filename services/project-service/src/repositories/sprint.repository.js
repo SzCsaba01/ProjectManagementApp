@@ -15,7 +15,9 @@ class SprintRepository {
 
     async updateSprintAsync(newSprintData) {
         const { _id, ...sprintWithoutId } = newSprintData;
-        return await Sprint.findOneAndUpdate({ _id: _id }, sprintWithoutId);
+        return await Sprint.findOneAndUpdate({ _id: _id }, sprintWithoutId, {
+            new: true,
+        });
     }
 
     async findAndUpdateSprintBySprintId(sprintId, newSprintData) {

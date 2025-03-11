@@ -173,9 +173,7 @@ class ProjectService {
     }
 
     async deleteProjectByProjectIdAsync(projectId) {
-        await this.projectRedisRepository.deleteProjectByProjectIdAsync(
-            projectId,
-        );
+        await this.projectRedisRepository.deleteProjectByIdAsync(projectId);
         const deletedProject =
             await this.projectRepository.deleteProjectByProjectIdAsync(
                 projectId,

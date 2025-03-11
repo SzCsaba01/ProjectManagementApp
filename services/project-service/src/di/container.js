@@ -6,16 +6,8 @@ import {
     SprintRepository,
     SprintRedisRepository,
 } from '../repositories/index.js';
-import {
-    BacklogService,
-    ProjectService,
-    SprintService,
-} from '../services/index.js';
-import {
-    BacklogController,
-    ProjectController,
-    SprintController,
-} from '../controllers/index.js';
+import { ProjectService, SprintService } from '../services/index.js';
+import { ProjectController, SprintController } from '../controllers/index.js';
 
 const container = createContainer();
 
@@ -28,12 +20,10 @@ container.register({
     projectRedisRepository: asClass(ProjectRedisRepository).scoped(),
 
     //Services
-    backlogService: asClass(BacklogService).scoped(),
     sprintService: asClass(SprintService).scoped(),
     projectService: asClass(ProjectService).scoped(),
 
     //Controller
-    backlogController: asClass(BacklogController).scoped(),
     sprintController: asClass(SprintController).scoped(),
     projectController: asClass(ProjectController).scoped(),
 });
